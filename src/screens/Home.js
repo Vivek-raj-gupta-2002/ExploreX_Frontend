@@ -1,14 +1,33 @@
 import React from 'react';
-import { Text } from 'react-native';
+import { Text, TextInput, StyleSheet } from 'react-native';
+import CustomCard from '../components/card';
+
 
 const HomeScreen = () => {
     return (
         <>
-            <Text>Welcome to the Home Screen!</Text>
-        </>
-            
+            <CustomCard>
+                
+            </CustomCard>
+
+            <CustomCard>
+                
+            </CustomCard>
+
+            <CustomCard>
+
+            </CustomCard>
         
+
+            <CustomCard>
+
+            </CustomCard>
+        </>
     );
 };
+
+const styles = StyleSheet.create({
+    
+});
 
 export default HomeScreen;
