@@ -6,9 +6,14 @@ import { SafeAreaView } from 'react-native';
 
 export default function App() {
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <BottomNavBar />
-    </SafeAreaView>
+    <>
+      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+      <SafeAreaView style={{ flex: 1, height: 20, }}>
+        
+        <BottomNavBar />
+      </SafeAreaView>
+    </>
+    
   );
 }
 
