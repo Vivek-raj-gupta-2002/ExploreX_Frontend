@@ -45,7 +45,14 @@ export default function BottomNavBar() {
     return (
         <NavigationContainer>
             <Tab.Navigator screenOptions={icons}>
-                <Tab.Screen name="Home" component={HomeScreen} options={{ title: 'ExploreX' }} />
+                <Tab.Screen name="Home" component={HomeScreen} options={{
+                    title: 'ExploreX',
+                    headerTintColor: 'tomato',
+                    headerTitleStyle: {
+                        fontWeight: 'bold',
+                        fontSize: 23,
+                    },
+                }} />
                 <Tab.Screen name="Analytics" component={AnalyticsScreen} />
                 <Tab.Screen name="Groups" component={GroupScreen} />
                 <Tab.Screen name="Settings" component={SettingsScreen} />
