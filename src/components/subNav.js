@@ -5,6 +5,7 @@ import AnalyticsScreen from '../screens/Analitics';
 import GroupScreen from '../screens/Groups';
 import SettingsScreen from '../screens/Settings';
 import NotesScreen from './subScreens/notes';
+import LeaderScreen from './subScreens/leaderBoard';
 
 const Stack = createNativeStackNavigator();
 
@@ -18,6 +19,7 @@ export default function SubNav() {
             <Stack.Screen name="Groups" component={GroupScreen} />
             <Stack.Screen name="Settings" component={SettingsScreen} />
             <Stack.Screen name="Notes" component={NotesScreen} />
+            <Stack.Screen name="leaderBoard" component={LeaderScreen} />
 
         </Stack.Navigator>
 

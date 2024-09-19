@@ -6,6 +6,7 @@ import CustomButton from '../components/button';
 import TextStyles from '../styles/textStyles';
 import CustomIconButton from '../components/iconButton';
 import LikeDislikeButton from '../components/likeDisklike';
+import LeaderScreen from '../components/subScreens/leaderBoard';
 
 // Sample data for the music slider
 const musicSuggestions = [
@@ -83,7 +84,8 @@ const HomeScreen = ({ navigation }) => {
                             style={styles.iconButton}
                         />
                     </CustomCard>
-                    <CustomButton textColor="grey" backgroundColor="white" title="Leader Board" />
+                    <CustomButton textColor="grey" backgroundColor="white" title="Leader Board" onPress={() => { navigation.navigate('leaderBoard') }} />
+
                 </CustomCard>
 
                 {/* About your Personality */}
