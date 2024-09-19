@@ -59,7 +59,7 @@ const renderMusicItem = ({ item }) => (
     </CustomCard>
 );
 
-const HomeScreen = () => {
+const HomeScreen = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -109,13 +109,14 @@ const HomeScreen = () => {
             </ScrollView>
 
             {/* Floating Action Button */}
-            <TouchableOpacity style={styles.floatingButton} onPress={() => console.log("Plus Button Pressed")}>
+            <TouchableOpacity style={styles.floatingButton}>
                 <CustomIconButton
                     iconName="add"
                     iconColor="white"
                     backgroundColor="tomato"
                     iconSize={30}
                     style={styles.plusIcon}
+                    onPress={() => { navigation.navigate('Notes')}}
                 />
             </TouchableOpacity>
         </View>

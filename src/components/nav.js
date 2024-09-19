@@ -7,6 +7,8 @@ import HomeScreen from '../screens/Home';
 import GroupScreen from '../screens/Groups';
 import AnalyticsScreen from '../screens/Analitics';
 import SettingsScreen from '../screens/Settings';
+import NotesScreen from './subScreens/notes';
+import SubNav from './subNav';
 
 
 const icons = ({ route }) => ({
@@ -43,9 +45,9 @@ const Tab = createBottomTabNavigator();
 
 export default function BottomNavBar() {
     return (
-        <NavigationContainer>
+        <>
             <Tab.Navigator screenOptions={icons}>
-                <Tab.Screen name="Home" component={HomeScreen} options={{
+                <Tab.Screen name="nav" component={SubNav} options={{
                     title: 'ExploreX',
                     headerTintColor: 'tomato',
                     headerTitleStyle: {
@@ -57,6 +59,6 @@ export default function BottomNavBar() {
                 <Tab.Screen name="Groups" component={GroupScreen} />
                 <Tab.Screen name="Settings" component={SettingsScreen} />
             </Tab.Navigator>
-        </NavigationContainer>
+        </>
     );
 }
