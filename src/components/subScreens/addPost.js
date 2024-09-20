@@ -98,7 +98,8 @@ const styles = StyleSheet.create({
     imagePicker: {
         justifyContent: 'center',
         alignItems: 'center',
-        height: 200,
+        width: '100%',
+        height: 400,
         backgroundColor: '#f0f0f0',
         borderRadius: 10,
         marginBottom: 20,
