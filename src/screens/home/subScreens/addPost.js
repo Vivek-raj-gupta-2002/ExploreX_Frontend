@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { View, TextInput, TouchableOpacity, Image, StyleSheet, Text } from 'react-native';
 import * as ImagePicker from 'expo-image-picker'; // To pick images from the device
-import CustomButton from '../button'; // Assuming you have a custom button component
+import CustomButton from '../../../components/button'; // Assuming you have a custom button component
 
 const AddPostScreen = ({ navigation, route }) => {
     const [description, setDescription] = useState('');

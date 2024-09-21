@@ -1,12 +1,11 @@
 import React from 'react';
 import { Text, StyleSheet, View, ScrollView, FlatList, Image, TouchableOpacity } from 'react-native';
-import CustomCard from '../components/card';
-import CustomTextInput from '../components/input';
-import CustomButton from '../components/button';
-import TextStyles from '../styles/textStyles';
-import CustomIconButton from '../components/iconButton';
-import LikeDislikeButton from '../components/likeDisklike';
-import LeaderScreen from '../components/subScreens/leaderBoard';
+import CustomCard from '../../components/card';
+import CustomTextInput from '../../components/input';
+import CustomButton from '../../components/button';
+import TextStyles from '../../styles/textStyles';
+import CustomIconButton from '../../components/iconButton';
+import LikeDislikeButton from '../../components/likeDisklike';
 
 // Sample data for the music slider
 const musicSuggestions = [
@@ -14,25 +13,25 @@ const musicSuggestions = [
         id: '1',
         title: 'Song Title 1',
         description: 'Artist 1',
-        image: require('../assets/download.jpeg'),
+        image: require('../../assets/download.jpeg'),
     },
     {
         id: '2',
         title: 'Song Title 2',
         description: 'Artist 2',
-        image: require('../assets/download.jpeg'),
+        image: require('../../assets/download.jpeg'),
     },
     {
         id: '3',
         title: 'Song Title 3',
         description: 'Artist 3',
-        image: require('../assets/download.jpeg'),
+        image: require('../../assets/download.jpeg'),
     },
     {
         id: '4',
         title: 'Song Title 4',
         description: 'Artist 4',
-        image: require('../assets/download.jpeg'),
+        image: require('../../assets/download.jpeg'),
     },
 ];
 
@@ -119,7 +118,7 @@ const HomeScreen = ({ navigation }) => {
                     backgroundColor="tomato"
                     iconSize={30}
                     style={styles.plusIcon}
-                    onPress={() => { navigation.navigate('Notes')}}
+                    onPress={() => { navigation.navigate('Notes') }}
                 />
             </TouchableOpacity>
         </View>

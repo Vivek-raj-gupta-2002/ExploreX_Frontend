@@ -2,28 +2,28 @@
 
 import React, { useState } from 'react';
 import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
-import LikeDislikeButton from '../likeDisklike'; // Adjust import path if necessary
+import LikeDislikeButton from '../../../components/likeDisklike'; // Adjust import path if necessary
 
 const posts = [
     {
         id: '1',
         userName: 'john_doe',
         profileImage: 'https://randomuser.me/api/portraits/men/32.jpg',
-        postImage: require('../../assets/download.jpeg'), // Example post image
+        postImage: require('../../../assets/download.jpeg'), // Example post image
         description: 'This is a description of the photo. #awesome #cute #instagramclone',
     },
     {
         id: '2',
         userName: 'jane_smith',
         profileImage: 'https://randomuser.me/api/portraits/women/44.jpg',
-        postImage: require('../../assets/download.jpeg'), // Example post image
+        postImage: require('../../../assets/download.jpeg'), // Example post image
         description: 'Another description of a different photo. #fun #dayout',
     },
     {
         id: '3',
         userName: 'peter_parker',
         profileImage: 'https://randomuser.me/api/portraits/men/56.jpg',
-        postImage: require('../../assets/download.jpeg'), // Example post image
+        postImage: require('../../../assets/download.jpeg'), // Example post image
         description: 'Enjoying the day! #sunny #relax',
     },
 ];

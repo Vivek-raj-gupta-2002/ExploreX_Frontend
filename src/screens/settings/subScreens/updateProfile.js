@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Image, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import CustomButton from '../button';
-import TextStyles from '../../styles/textStyles';
+import CustomButton from '../../../components/button';
+import TextStyles from '../../../styles/textStyles';
 
 const UpdateProfileScreen = ({ navigation, route }) => {
     const userInfo = route?.params || {

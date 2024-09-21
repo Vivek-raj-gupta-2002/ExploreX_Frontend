@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
-import CustomButton from '../components/button';
-import CustomCard from '../components/card';
-import TextStyles from '../styles/textStyles'; // Your predefined text styles
+import CustomButton from '../../components/button';
+import CustomCard from '../../components/card';
+import TextStyles from '../../styles/textStyles'; // Your predefined text styles
 
 const SettingsScreen = ({ navigation }) => {
     const userInfo = {

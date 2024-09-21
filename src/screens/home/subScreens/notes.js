@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, TextInput, Button, ScrollView } from 'react-native';
-import CustomButton from '../button';
-import TextStyles from '../../styles/textStyles';
+import CustomButton from '../../../components/button';
+import TextStyles from '../../../styles/textStyles';
 
 const NotesScreen = () => {
     const [note, setNote] = useState('');
