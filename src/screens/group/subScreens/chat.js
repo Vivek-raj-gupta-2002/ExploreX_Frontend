@@ -19,17 +19,7 @@ const ChatScreen = ({ navigation, route }) => {
     return (
         <KeyboardAvoidingView style={styles.container} behavior="padding">
             {/* Header with Back Button */}
-            <View style={styles.header}>
-                <CustomIconButton
-                    iconName="arrow-back"
-                    onPress={() => navigation.goBack()} // Go back to the Groups screen
-                />
-                <Text style={styles.chatTitle}>{groupName}</Text>
-                <CustomIconButton
-                    iconName="exit-outline"
-                    onPress={() => console.log("Leave Group")}
-                />
-            </View>
+            
 
             {/* Chat Content */}
             <View style={styles.chatContent}>

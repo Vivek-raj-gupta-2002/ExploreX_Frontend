@@ -8,7 +8,7 @@ export default function App() {
   return (
     <>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-      <SafeAreaView style={{ flex: 1, height: 20, }}>
+      <SafeAreaView style={{ flex: 1, height: 20, marginTop:25}}>
         <NavigationContainer>
           <BottomNavBar />
         </NavigationContainer>

@@ -67,7 +67,7 @@ const UpdateProfileScreen = ({ navigation, route }) => {
     return (
         <ScrollView contentContainerStyle={styles.scrollContainer}>
             <View style={styles.container}>
-                <Text style={TextStyles.heading1}>Update Profile</Text>
+                {/* <Text style={TextStyles.heading1}>Update Profile</Text> */}
 
                 {/* Profile Picture */}
                 <TouchableOpacity onPress={pickImage}>

@@ -6,7 +6,7 @@ const AnaliticsStack = createNativeStackNavigator();
 
 function AnaliticsNav() {
     return (
-        <AnaliticsStack.Navigator screenOptions={{ headerShown: false }}>
+        <AnaliticsStack.Navigator>
             <AnaliticsStack.Screen name="Analytics" component={AnalyticsScreen} />
         </AnaliticsStack.Navigator>
     );

@@ -4,16 +4,38 @@ import HomeScreen from './Home';
 import NotesScreen from './subScreens/notes';
 import LeaderScreen from './subScreens/leaderBoard';
 import AddPostScreen from './subScreens/addPost';
+import TextStyles from '../../styles/textStyles';
 
 const HomeStack = createNativeStackNavigator();
 
 function HomeNav() {
     return (
-        <HomeStack.Navigator screenOptions={{ headerShown: false }}>
-            <HomeStack.Screen name="Home" component={HomeScreen} />
-            <HomeStack.Screen name="Notes" component={NotesScreen} />
-            <HomeStack.Screen name="addPost" component={AddPostScreen} />
-            <HomeStack.Screen name="leaderBoard" component={LeaderScreen} />
+        <HomeStack.Navigator>
+            <HomeStack.Screen
+                name="Home"
+                component={HomeScreen}
+                options={{ 
+                    title: 'ExploreX',
+                    headerTitleStyle: [TextStyles.heading3,  {color: 'tomato'}],
+
+                }}
+                
+            />
+
+            <HomeStack.Screen
+                name="Notes"
+                component={NotesScreen}
+            />
+
+            <HomeStack.Screen
+                name="addPost"
+                component={AddPostScreen}
+            />
+
+            <HomeStack.Screen
+                name="leaderBoard"
+                component={LeaderScreen}
+            />
         </HomeStack.Navigator>
     );
 }
