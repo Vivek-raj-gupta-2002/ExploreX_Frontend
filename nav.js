@@ -7,7 +7,7 @@ import AnaliticsNav from './src/screens/analytics/AnaliticsNav';
 import SettingsNav from './src/screens/settings/SettingsNav';
 
 const icons = ({ route }) => ({
-    tabBarShowLabel: false,
+    tabBarShowLabel: false, 
     tabBarIcon: ({ color }) => {
         let iconName;
 
@@ -40,9 +40,9 @@ export default function BottomNavBar() {
     return (
         <Tab.Navigator screenOptions={icons}>
             <Tab.Screen name="HomeNav" component={HomeNav} options={{ title: 'ExploreX' }} />
-            <Tab.Screen name="AnalyticsNav" component={AnaliticsNav} />
-            <Tab.Screen name="GroupsNav" component={GroupNav} />
-            <Tab.Screen name="SettingsNav" component={SettingsNav} />
+            <Tab.Screen name="AnalyticsNav" component={AnaliticsNav} options={{ title: 'Analytics' }} />
+            <Tab.Screen name="GroupsNav" component={GroupNav} options={{ title: 'Groups' }} />
+            <Tab.Screen name="SettingsNav" component={SettingsNav} options={{ title: 'Settings' }} />
         </Tab.Navigator>
     );
 }
