@@ -9,7 +9,7 @@ function SettingsNav() {
     return (
         <SettingsStack.Navigator >
             <SettingsStack.Screen name="Settings" component={SettingsScreen} />
-            <SettingsStack.Screen name="updateProfile" component={UpdateProfileScreen} />
+            <SettingsStack.Screen name="Update Profile" component={UpdateProfileScreen} />
         </SettingsStack.Navigator>
     );
 }

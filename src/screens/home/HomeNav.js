@@ -28,12 +28,12 @@ function HomeNav() {
             />
 
             <HomeStack.Screen
-                name="addPost"
+                name="New Post"
                 component={AddPostScreen}
             />
 
             <HomeStack.Screen
-                name="leaderBoard"
+                name="Leader Board"
                 component={LeaderScreen}
             />
         </HomeStack.Navigator>

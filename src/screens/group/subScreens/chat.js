@@ -1,36 +1,83 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, KeyboardAvoidingView } from 'react-native';
 import CustomIconButton from '../../../components/iconButton';
 import CustomTextInput from '../../../components/input';
-import CustomButton from '../../../components/button';
 
 const ChatScreen = ({ navigation, route }) => {
-    const { groupName } = route.params; // Assuming you're passing the group name as a parameter
+    const { groupName } = route.params;
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState([]);
+    const flatListRef = useRef(null);
 
     const handleSend = () => {
         if (message.trim()) {
-            setMessages(prevMessages => [...prevMessages, message.trim()]);
-            setMessage(''); // Clear the input field after sending
+            const timestamp = new Date().toLocaleTimeString();
+            // Add the message as a sent message
+            setMessages(prevMessages => [
+                ...prevMessages,
+                { text: message.trim(), sent: true, time: timestamp }
+            ]);
+            setMessage(''); // Clear input field
+
+            // Simulate receiving a message after sending
+            simulateReceiveMessage();
+
+            // Scroll to the bottom after updating messages
+            setTimeout(() => {
+                flatListRef.current.scrollToEnd({ animated: true });
+            }, 100);
         }
     };
+
+    const simulateReceiveMessage = () => {
+        const randomMessages = [
+            "Hello! How are you?",
+            "What are you doing?",
+            "Let's catch up soon!",
+            "Do you have any plans for the weekend?",
+            "That's interesting!"
+        ];
+        const randomMessage = randomMessages[Math.floor(Math.random() * randomMessages.length)];
+        const timestamp = new Date().toLocaleTimeString();
+
+        // Add a delay before simulating the received message
+        setTimeout(() => {
+            setMessages(prevMessages => [
+                ...prevMessages,
+                { text: randomMessage, sent: false, time: timestamp }
+            ]);
+            flatListRef.current.scrollToEnd({ animated: true });
+        }, 2000); // Simulate receiving message after 2 seconds
+    };
+
+    const renderMessage = ({ item }) => (
+        <View style={item.sent ? styles.sentMessageBubble : styles.receivedMessageBubble}>
+            <Text style={item.sent ? styles.sentMessageText : styles.receivedMessageText}>
+                {item.text}
+            </Text>
+            <Text style={styles.messageTime}>{item.time}</Text>
+        </View>
+    );
+
+    useEffect(() => {
+        flatListRef.current.scrollToEnd({ animated: true });
+    }, [messages]);
 
     return (
         <KeyboardAvoidingView style={styles.container} behavior="padding">
             {/* Header with Back Button */}
-            
+            <View style={styles.header}>
+                <Text style={styles.chatTitle}>{groupName}</Text>
+            </View>
 
             {/* Chat Content */}
             <View style={styles.chatContent}>
                 <FlatList
+                    ref={flatListRef}
                     data={messages}
                     keyExtractor={(item, index) => index.toString()}
-                    renderItem={({ item }) => (
-                        <View style={styles.messageBubble}>
-                            <Text style={styles.messageText}>{item}</Text>
-                        </View>
-                    )}
+                    renderItem={renderMessage}
+                    
                 />
             </View>
 
@@ -74,15 +121,33 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 10,
     },
-    messageBubble: {
+    sentMessageBubble: {
+        backgroundColor: 'tomato',
+        padding: 10,
+        marginVertical: 5,
+        borderRadius: 8,
+        alignSelf: 'flex-end',
+    },
+    receivedMessageBubble: {
         backgroundColor: '#ececec',
         padding: 10,
         marginVertical: 5,
         borderRadius: 8,
         alignSelf: 'flex-start',
     },
-    messageText: {
+    sentMessageText: {
         fontSize: 16,
+        color: 'white',
+    },
+    receivedMessageText: {
+        fontSize: 16,
+        color: 'black',
+    },
+    messageTime: {
+        fontSize: 12,
+        color: 'gray',
+        textAlign: 'right',
+        marginTop: 2,
     },
     inputContainer: {
         flexDirection: 'row',
@@ -91,7 +156,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#f1f1f1',
     },
     textInput: {
-        flex: 1, // Ensures the text input takes all available space
+        flex: 1,
         marginRight: 10,
     },
     sendButton: {

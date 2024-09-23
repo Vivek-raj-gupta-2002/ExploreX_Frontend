@@ -46,7 +46,7 @@ const SettingsScreen = ({ navigation }) => {
 
             {/* Update Button */}
             <TouchableOpacity style={styles.updateButton}>
-                <CustomButton title="Update Profile" onPress={() => { navigation.navigate('updateProfile') }} />
+                <CustomButton title="Update Profile" onPress={() => { navigation.navigate('Update Profile') }} />
             </TouchableOpacity>
         </View>
     );

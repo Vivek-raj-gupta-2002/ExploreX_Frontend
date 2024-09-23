@@ -81,10 +81,10 @@ const HomeScreen = ({ navigation }) => {
                             backgroundColor="tomato"
                             iconSize={20}
                             style={styles.iconButton}
-                            onPress={() => { navigation.navigate('addPost') }}
+                            onPress={() => { navigation.navigate('New Post') }}
                         />
                     </CustomCard>
-                    <CustomButton textColor="grey" backgroundColor="white" title="Leader Board" onPress={() => { navigation.navigate('leaderBoard') }} />
+                    <CustomButton textColor="grey" backgroundColor="white" title="Leader Board" onPress={() => { navigation.navigate('Leader Board') }} />
 
                 </CustomCard>
 
