@@ -43,8 +43,8 @@ const ChatScreen = ({ navigation, route }) => {
                     styleInput={styles.textInput}
                     width={"75%"}
                 />
-                <CustomButton
-                    title="Send"
+                <CustomIconButton
+                    iconName="send"
                     onPress={handleSend}
                     style={styles.sendButton}
                 />
