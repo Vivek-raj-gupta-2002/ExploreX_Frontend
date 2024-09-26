@@ -4,11 +4,12 @@ import { View, Text, StyleSheet, TouchableOpacity, Image, Dimensions, Alert } fr
 import { GoogleSignin, statusCodes, isErrorWithCode } from '@react-native-google-signin/google-signin';
 import { LinearGradient } from 'expo-linear-gradient';
 import { GOOGLE_WEB_CLIENT_ID } from '@env';
+import { storeData } from '../../scripts/storage';
 
 const { width, height } = Dimensions.get('window');
 const LoginLogo = require('../../assets/googleLoginLogo.png');
 
-const GoogleLoginScreen = () => {
+const GoogleLoginScreen = ({navigation}) => {
 
     useEffect(() => {
         GoogleSignin.configure({
@@ -20,7 +21,11 @@ const GoogleLoginScreen = () => {
         try {
             await GoogleSignin.hasPlayServices();
             const userInfo = await GoogleSignin.signIn();
-            console.log('User info: ', userInfo);
+            // console.log('User info: ', userInfo.data.idToken);
+
+            await storeData('userToken', userInfo.data.idToken);
+            await storeData('userDetails', userInfo.data.user);
+            navigation.navigate('HomeNav');
             
 
         } catch (error) {

@@ -4,14 +4,19 @@ import GoogleLoginScreen from './login';
 
 const GoogleStack = createNativeStackNavigator();
 
-function LoginNav() {
+function LoginNav({navigation}) {
+    
+    React.useLayoutEffect(() => {
+        navigation.setOptions({ tabBarStyle: { display: 'none' } });
+    })
+    
     return (
-        <GoogleStack.Navigator>
+        <GoogleStack.Navigator >
             <GoogleStack.Screen
                 name="login"
                 component={GoogleLoginScreen}
                 options={{
-                    headerShown: false
+                    headerShown: false, tabBarStyle: { display: 'none' }
                 }}
 
             />
