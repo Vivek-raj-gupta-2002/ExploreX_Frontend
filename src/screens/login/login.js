@@ -1,35 +1,41 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Dimensions } from 'react-native';
+// Helped for doing authentication https://react-native-google-signin.github.io/
+import React, { useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Dimensions, Alert } from 'react-native';
+import { GoogleSignin, statusCodes, isErrorWithCode } from '@react-native-google-signin/google-signin';
 import { LinearGradient } from 'expo-linear-gradient';
+import { GOOGLE_WEB_CLIENT_ID } from '@env';
 
 const { width, height } = Dimensions.get('window');
 const LoginLogo = require('../../assets/googleLoginLogo.png');
 
 const GoogleLoginScreen = () => {
+
+    useEffect(() => {
+        GoogleSignin.configure({
+            webClientId: GOOGLE_WEB_CLIENT_ID, // Add your WebClient ID here
+        });
+    }, []);
+
+    const signIn = async () => {
+        try {
+            await GoogleSignin.hasPlayServices();
+            const userInfo = await GoogleSignin.signIn();
+            console.log('User info: ', userInfo);
+            
+
+        } catch (error) {
+            console.log('An unknown error occurred:', error);
+        }
+    };
+
     return (
         <View style={styles.container}>
             {/* Multiple Wavy Gradients */}
             <View style={styles.gradientContainer}>
-                {/* First Wave */}
-                <LinearGradient
-                    colors={['tomato', 'orange']}
-                    style={styles.waveOne}
-                />
-                {/* Second Wave */}
-                <LinearGradient
-                    colors={['orange', 'transparent']}
-                    style={styles.waveTwo}
-                />
-                {/* Third Wave */}
-                <LinearGradient
-                    colors={['tomato', 'transparent']}
-                    style={styles.waveThree}
-                />
-                {/* Fourth Wave */}
-                <LinearGradient
-                    colors={['orange', 'transparent']}
-                    style={styles.waveFour}
-                />
+                <LinearGradient colors={['tomato', 'orange']} style={styles.waveOne} />
+                <LinearGradient colors={['orange', 'transparent']} style={styles.waveTwo} />
+                <LinearGradient colors={['tomato', 'transparent']} style={styles.waveThree} />
+                <LinearGradient colors={['orange', 'transparent']} style={styles.waveFour} />
             </View>
 
             {/* Logo and App Name */}
@@ -39,17 +45,15 @@ const GoogleLoginScreen = () => {
 
             {/* Google Login Button */}
             <View style={styles.bottomContainer}>
-                <TouchableOpacity style={styles.googleButton}>
-                    <Image
-                        source={LoginLogo}
-                        style={styles.googleLogo}
-                    />
+                <TouchableOpacity style={styles.googleButton} onPress={signIn}>
+                    <Image source={LoginLogo} style={styles.googleLogo} />
                     <Text style={styles.googleButtonText}>Login with Google</Text>
                 </TouchableOpacity>
             </View>
         </View>
     );
 };
+
 
 const styles = StyleSheet.create({
     container: {
