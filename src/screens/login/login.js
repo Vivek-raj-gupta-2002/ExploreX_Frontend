@@ -1,37 +1,20 @@
-// Helped for doing authentication https://react-native-google-signin.github.io/
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Dimensions, Alert } from 'react-native';
-import { GoogleSignin, statusCodes, isErrorWithCode } from '@react-native-google-signin/google-signin';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Dimensions } from 'react-native';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { LinearGradient } from 'expo-linear-gradient';
 import { GOOGLE_WEB_CLIENT_ID } from '@env';
-import { storeData } from '../../scripts/storage';
+import { signInWithGoogle } from '../../scripts/auth'; // Import the sign-in function
 
 const { width, height } = Dimensions.get('window');
 const LoginLogo = require('../../assets/googleLoginLogo.png');
 
-const GoogleLoginScreen = ({navigation}) => {
-
+const GoogleLoginScreen = ({ navigation }) => {
     useEffect(() => {
+        // Configure Google Sign-In
         GoogleSignin.configure({
-            webClientId: GOOGLE_WEB_CLIENT_ID, // Add your WebClient ID here
+            webClientId: GOOGLE_WEB_CLIENT_ID,
         });
     }, []);
-
-    const signIn = async () => {
-        try {
-            await GoogleSignin.hasPlayServices();
-            const userInfo = await GoogleSignin.signIn();
-            // console.log('User info: ', userInfo.data.idToken);
-
-            await storeData('userToken', userInfo.data.idToken);
-            await storeData('userDetails', userInfo.data.user);
-            navigation.navigate('HomeNav');
-            
-
-        } catch (error) {
-            console.log('An unknown error occurred:', error);
-        }
-    };
 
     return (
         <View style={styles.container}>
@@ -50,7 +33,7 @@ const GoogleLoginScreen = ({navigation}) => {
 
             {/* Google Login Button */}
             <View style={styles.bottomContainer}>
-                <TouchableOpacity style={styles.googleButton} onPress={signIn}>
+                <TouchableOpacity style={styles.googleButton} onPress={() => signInWithGoogle(navigation)}>
                     <Image source={LoginLogo} style={styles.googleLogo} />
                     <Text style={styles.googleButtonText}>Login with Google</Text>
                 </TouchableOpacity>
@@ -58,7 +41,6 @@ const GoogleLoginScreen = ({navigation}) => {
         </View>
     );
 };
-
 
 const styles = StyleSheet.create({
     container: {
