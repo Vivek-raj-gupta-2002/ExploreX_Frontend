@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { View, ActivityIndicator } from 'react-native'; // Import required components for loading state
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import HomeNav from './src/screens/home/HomeNav';
@@ -39,12 +40,18 @@ const icons = ({ route }) => ({
 const Tab = createBottomTabNavigator();
 
 export default function BottomNavBar() {
-    const [isAuth, setIsAuth] = useState(false);
+    const [isAuth, setIsAuth] = useState(null); // Initialize as null to show loading state
 
     useEffect(() => {
         const checkAuthStatus = async () => {
-            const token = await getData('userToken');
-            setIsAuth(!!token); // Update isAuth based on whether a token exists
+            try {
+                const token = await getData('userToken');
+                console.log("Token:", token); // Debugging: Check if token is fetched
+                setIsAuth(!!token); // Update isAuth based on whether a token exists
+            } catch (error) {
+                console.error("Error fetching token:", error);
+                setIsAuth(false); // Set to false if an error occurs
+            }
         };
 
         checkAuthStatus();
@@ -90,11 +97,35 @@ export default function BottomNavBar() {
                     />
                 </>
             ) : (
-                <Tab.Screen
-                    name="LoginNav"
-                    component={LoginNav}
-                    options={{ headerShown: false, tabBarButton: () => null }}
-                />
+                <>
+                    <Tab.Screen
+                        name="LoginNav"
+                        component={LoginNav}
+                        options={{ headerShown: false, tabBarButton: () => null }}
+                    />
+                    <Tab.Screen
+                        name="HomeNav"
+                        component={HomeNav}
+                        options={{ headerShown: false }}
+                    />
+                    <Tab.Screen
+                        name="AnalyticsNav"
+                        component={AnalyticsNav}
+                        options={{ headerShown: false }}
+                    />
+                    <Tab.Screen
+                        name="GroupsNav"
+                        component={GroupNav}
+                        options={{ headerShown: false }}
+                    />
+                    <Tab.Screen
+                        name="SettingsNav"
+                        component={SettingsNav}
+                        options={{ headerShown: false }}
+                    />
+
+                </>
+
             )}
         </Tab.Navigator>
     );

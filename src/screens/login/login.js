@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Dimensions } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Dimensions, ActivityIndicator } from 'react-native';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { LinearGradient } from 'expo-linear-gradient';
 import { GOOGLE_WEB_CLIENT_ID } from '@env';
@@ -9,12 +9,23 @@ const { width, height } = Dimensions.get('window');
 const LoginLogo = require('../../assets/googleLoginLogo.png');
 
 const GoogleLoginScreen = ({ navigation }) => {
+    const [loading, setLoading] = useState(false); // Loading state
+
     useEffect(() => {
         // Configure Google Sign-In
         GoogleSignin.configure({
             webClientId: GOOGLE_WEB_CLIENT_ID,
         });
     }, []);
+
+    const handleGoogleSignIn = async () => {
+        setLoading(true); // Set loading to true when sign-in starts
+        try {
+            await signInWithGoogle(navigation);
+        } finally {
+            setLoading(false); // Set loading back to false after sign-in completes or fails
+        }
+    };
 
     return (
         <View style={styles.container}>
@@ -31,12 +42,16 @@ const GoogleLoginScreen = ({ navigation }) => {
                 <Text style={styles.appName}>ExploreX</Text>
             </View>
 
-            {/* Google Login Button */}
+            {/* Google Login Button or Loading Spinner */}
             <View style={styles.bottomContainer}>
-                <TouchableOpacity style={styles.googleButton} onPress={() => signInWithGoogle(navigation)}>
-                    <Image source={LoginLogo} style={styles.googleLogo} />
-                    <Text style={styles.googleButtonText}>Login with Google</Text>
-                </TouchableOpacity>
+                {loading ? (
+                    <ActivityIndicator size="large" color="tomato" /> // Loading spinner while signing in
+                ) : (
+                    <TouchableOpacity style={styles.googleButton} onPress={handleGoogleSignIn}>
+                        <Image source={LoginLogo} style={styles.googleLogo} />
+                        <Text style={styles.googleButtonText}>Login with Google</Text>
+                    </TouchableOpacity>
+                )}
             </View>
         </View>
     );
