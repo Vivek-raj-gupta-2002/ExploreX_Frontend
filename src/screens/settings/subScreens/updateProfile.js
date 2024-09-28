@@ -1,55 +1,64 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Image, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
+import { View, Text, TextInput, ScrollView, Alert, StyleSheet } from 'react-native';
 import CustomButton from '../../../components/button';
 import TextStyles from '../../../styles/textStyles';
+import { createOrUpdateProfile } from '../../../scripts/profileAPI';
+import { storeData } from '../../../scripts/storage';
 
 const UpdateProfileScreen = ({ navigation, route }) => {
-    const userInfo = route?.params || {
-        name: '',
-        bio: '',
-        profilePic: '',
+    const { userProfile } = route.params;
+    const { email, bio: initialBio, goodThings: initialGoodThings, badThings: initialBadThings } = userProfile || {
         email: '',
+        bio: '',
         goodThings: [],
         badThings: [],
     };
 
-    const [name, setName] = useState(userInfo.name);
-    const [bio, setBio] = useState(userInfo.bio);
-    const [profilePic, setProfilePic] = useState(userInfo.profilePic);
-    const [goodThings, setGoodThings] = useState(userInfo.goodThings.length ? userInfo.goodThings : ['', '', '', '', '']);
-    const [badThings, setBadThings] = useState(userInfo.badThings.length ? userInfo.badThings : ['', '', '', '', '']);
-    const email = userInfo.email;
+    const [bio, setBio] = useState(initialBio || '');
+    const [goodThings, setGoodThings] = useState(
+        Array.isArray(initialGoodThings) && initialGoodThings.length ? initialGoodThings : ['', '', '', '', '']
+    );
+    const [badThings, setBadThings] = useState(
+        Array.isArray(initialBadThings) && initialBadThings.length ? initialBadThings : ['', '', '', '', '']
+    );
 
-    // Handle image selection
-    const pickImage = async () => {
-        const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (permissionResult.granted === false) {
-            Alert.alert('Permission to access media library is required!');
+    const handleUpdateProfile = async () => {
+        if (!bio.trim()) {
+            Alert.alert('Error', 'Please enter your bio.');
             return;
         }
 
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsEditing: true,
-            aspect: [1, 1], // For square image cropping
-            quality: 1,
-        });
-
-        if (!result.canceled) {
-            setProfilePic(result.assets[0].uri); // Update the profile picture with the selected image URI
-        }
-    };
-
-    const handleUpdateProfile = () => {
-        if (!name || !bio || !profilePic) {
-            Alert.alert('Please fill in all the fields and select a profile picture.');
+        if (goodThings.every(item => !item.trim()) || badThings.every(item => !item.trim())) {
+            Alert.alert('Error', 'Please enter at least one good and bad habit.');
             return;
         }
 
-        console.log('Updated Profile:', { name, bio, profilePic, goodThings, badThings });
+        const profileData = {
+            email,
+            bio,
+            bad_habit_1: badThings[0],
+            bad_habit_2: badThings[1],
+            bad_habit_3: badThings[2],
+            bad_habit_4: badThings[3],
+            bad_habit_5: badThings[4],
+            good_habit_1: goodThings[0],
+            good_habit_2: goodThings[1],
+            good_habit_3: goodThings[2],
+            good_habit_4: goodThings[3],
+            good_habit_5: goodThings[4],
+        };
 
-        navigation.goBack();
+        // Call the API to create or update the profile
+        const result = await createOrUpdateProfile(profileData, email);
+
+        if (result) {
+            // Store the updated profile data in AsyncStorage
+            await storeData('userProfile', JSON.stringify(profileData));
+            Alert.alert('Success', 'Profile updated successfully!');
+            navigation.goBack();
+        } else {
+            Alert.alert('Error', 'Failed to update profile. Please try again.');
+        }
     };
 
     const updateGoodThings = (index, text) => {
@@ -65,46 +74,17 @@ const UpdateProfileScreen = ({ navigation, route }) => {
     };
 
     return (
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
-            <View style={styles.container}>
-                {/* <Text style={TextStyles.heading1}>Update Profile</Text> */}
-
-                {/* Profile Picture */}
-                <TouchableOpacity onPress={pickImage}>
-                    <Image
-                        source={{ uri: profilePic || 'https://via.placeholder.com/100' }}
-                        style={styles.profileImage}
-                    />
-                    <Text style={styles.imageText}>Change Profile Picture</Text>
-                </TouchableOpacity>
-
-                {/* Name Input */}
-                <Text style={TextStyles.subheading}>Name</Text>
-                <TextInput
-                    style={styles.input}
-                    value={name}
-                    onChangeText={setName}
-                    placeholder="Enter your name"
-                />
-
-                {/* Email Input (Non-editable) */}
-                <Text style={TextStyles.subheading}>Email (non-editable)</Text>
-                <TextInput
-                    style={[styles.input, styles.nonEditable]}
-                    value={email}
-                    editable={false}
-                />
-
-                {/* Bio Input */}
+        <View style={styles.container}>
+            <ScrollView contentContainerStyle={styles.scrollContainer}>
                 <Text style={TextStyles.subheading}>Bio</Text>
                 <TextInput
                     style={styles.input}
                     value={bio}
                     onChangeText={setBio}
                     placeholder="Enter your bio"
+                    multiline
                 />
 
-                {/* 5 Good Things */}
                 <Text style={TextStyles.subheading}>5 Good Things</Text>
                 {goodThings.map((item, index) => (
                     <TextInput
@@ -116,7 +96,6 @@ const UpdateProfileScreen = ({ navigation, route }) => {
                     />
                 ))}
 
-                {/* 5 Bad Things */}
                 <Text style={TextStyles.subheading}>5 Bad Things</Text>
                 {badThings.map((item, index) => (
                     <TextInput
@@ -128,47 +107,28 @@ const UpdateProfileScreen = ({ navigation, route }) => {
                     />
                 ))}
 
-                {/* Update Profile Button */}
                 <CustomButton title="Update Profile" onPress={handleUpdateProfile} />
-            </View>
-        </ScrollView>
+            </ScrollView>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
-    scrollContainer: {
-        flexGrow: 1,
-        justifyContent: 'center',
-        paddingBottom: 20,
-    },
     container: {
         flex: 1,
-        padding: 20,
         backgroundColor: '#f9f9f9',
+        padding: 20,
     },
-    profileImage: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
-        alignSelf: 'center',
-        marginBottom: 10,
-    },
-    imageText: {
-        textAlign: 'center',
-        color: '#888',
-        marginBottom: 20,
+    scrollContainer: {
+        paddingBottom: 20,
     },
     input: {
         borderWidth: 1,
         borderColor: '#ccc',
-        padding: 10,
         borderRadius: 5,
+        padding: 10,
         marginBottom: 15,
-        fontSize: 16,
-    },
-    nonEditable: {
-        backgroundColor: '#e9ecef',
-        color: '#888',
+        backgroundColor: '#fff',
     },
 });
 

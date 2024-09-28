@@ -26,6 +26,7 @@ const SettingsScreen = ({ navigation }) => {
                     if (!tempUserProfile) {
                         // Fetch user profile if not stored in AsyncStorage
                         const tempData = await getUserProfile(tempUser.username);
+                        // console.log(tempData);
                         if (tempData) {
                             storeData('userProfile', JSON.stringify(tempData));
                             setUserProfile(tempData); // Set the fetched profile data
@@ -85,7 +86,7 @@ const SettingsScreen = ({ navigation }) => {
                     {`${userInfo.first_name || ''} ${userInfo.last_name || ''}`}
                 </Text>
                 <Text style={TextStyles.paragraph}>
-                    {userInfo.username || userProfile.email}
+                    {userInfo.username || userProfile?.email || 'No username available'}
                 </Text>
                 <Text style={TextStyles.subheading}>
                     {userProfile?.bio || 'No bio available'}
@@ -115,7 +116,19 @@ const SettingsScreen = ({ navigation }) => {
 
             {/* Update Button */}
             <TouchableOpacity style={styles.updateButton}>
-                <CustomButton title="Update Profile" onPress={() => { navigation.navigate('Update Profile') }} />
+                <CustomButton
+                    title="Update Profile"
+                    onPress={() => {
+                        navigation.navigate('Update Profile', {
+                            userProfile: {
+                                email: userInfo.username,
+                                bio: userProfile?.bio || '',
+                                goodThings: goodThings.filter(habit => habit !== "No good habits listed"),
+                                badThings: badThings.filter(habit => habit !== "No bad habits listed"),
+                            },
+                        });
+                    }}
+                />
             </TouchableOpacity>
         </View>
     );
