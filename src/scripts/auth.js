@@ -1,13 +1,11 @@
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import { removeData, storeData } from './storage'; // Assuming storage script for async storage handling
+import { clearStorage, removeData, storeData } from './storage'; // Assuming storage script for async storage handling
 
 export const handleLogout = async (navigation) => {
     try {
 
         await GoogleSignin.signOut(); // Sign out from Google
-        await removeData('authToken');
-        await removeData('userDetails');
-        await removeData('access'); // Remove token from AsyncStorage
+        await clearStorage();
         alert('Successfully logged out');
 
         navigation.navigate('LoginNav'); // Redirect to login screen

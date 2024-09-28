@@ -3,18 +3,36 @@ import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import CustomButton from '../../components/button';
 import CustomCard from '../../components/card';
 import TextStyles from '../../styles/textStyles'; // Your predefined text styles
-import { getData } from '../../scripts/storage'; // Function to get data from AsyncStorage
+import { getData, storeData } from '../../scripts/storage'; // Function to get data from AsyncStorage
+import { getUserProfile } from '../../scripts/profileAPI';
 
 const SettingsScreen = ({ navigation }) => {
     const [userInfo, setUserInfo] = useState(null);
+    const [userProfile, setUserProfile] = useState(null);
 
     useEffect(() => {
-        // Function to fetch data from AsyncStorage
         const fetchUserData = async () => {
             try {
                 const storedUser = await getData('userDetails');
                 if (storedUser) {
-                    setUserInfo(JSON.parse(storedUser)); // Assuming storedUser is in JSON string format
+                    const tempUser = JSON.parse(storedUser);
+                    setUserInfo(tempUser);
+
+                    // Set userProfile to null before fetching or loading from storage
+                    setUserProfile(null);
+
+                    const tempUserProfile = await getData('userProfile');
+
+                    if (!tempUserProfile) {
+                        // Fetch user profile if not stored in AsyncStorage
+                        const tempData = await getUserProfile(tempUser.username);
+                        if (tempData) {
+                            storeData('userProfile', JSON.stringify(tempData));
+                            setUserProfile(tempData); // Set the fetched profile data
+                        }
+                    } else {
+                        setUserProfile(JSON.parse(tempUserProfile)); // Use the stored profile
+                    }
                 }
             } catch (error) {
                 console.error("Error fetching user data from storage:", error);
@@ -23,7 +41,6 @@ const SettingsScreen = ({ navigation }) => {
 
         fetchUserData();
 
-        // Optionally, you can add logic to refetch data whenever screen is focused
         const unsubscribe = navigation.addListener('focus', () => {
             fetchUserData();
         });
@@ -39,6 +56,23 @@ const SettingsScreen = ({ navigation }) => {
         );
     }
 
+    // Extract good and bad habits from userProfile with fallback values
+    const goodThings = [
+        userProfile?.good_habit_1 || "No good habits listed",
+        userProfile?.good_habit_2 || "No good habits listed",
+        userProfile?.good_habit_3 || "No good habits listed",
+        userProfile?.good_habit_4 || "No good habits listed",
+        userProfile?.good_habit_5 || "No good habits listed",
+    ];
+
+    const badThings = [
+        userProfile?.bad_habit_1 || "No bad habits listed",
+        userProfile?.bad_habit_2 || "No bad habits listed",
+        userProfile?.bad_habit_3 || "No bad habits listed",
+        userProfile?.bad_habit_4 || "No bad habits listed",
+        userProfile?.bad_habit_5 || "No bad habits listed",
+    ];
+
     return (
         <View style={styles.container}>
             {/* Profile Info */}
@@ -47,26 +81,36 @@ const SettingsScreen = ({ navigation }) => {
                     source={{ uri: userInfo.profile_pic || 'https://randomuser.me/api/portraits/men/4.jpg' }}
                     style={styles.profileImage}
                 />
-                <Text style={TextStyles.heading2}>{userInfo.first_name + " " + userInfo.last_name || ''}</Text>
-                <Text style={TextStyles.paragraph}>{userInfo.username || 'john.doe@example.com'}</Text>
-                <Text style={TextStyles.subheading}>{userInfo.bio || 'Lover of tech, coding, and coffee!'}</Text>
+                <Text style={TextStyles.heading2}>
+                    {`${userInfo.first_name || ''} ${userInfo.last_name || ''}`}
+                </Text>
+                <Text style={TextStyles.paragraph}>
+                    {userInfo.username || userProfile.email}
+                </Text>
+                <Text style={TextStyles.subheading}>
+                    {userProfile?.bio || 'No bio available'}
+                </Text>
             </View>
 
             {/* Custom Card for 5 Good and Bad Things */}
             <CustomCard containerStyle={styles.customCard}>
                 <Text style={TextStyles.heading3}>5 Good Things</Text>
-                {userInfo.goodThings?.map((item, index) => (
-                    <Text key={index} style={TextStyles.paragraph}>• {item}</Text>
-                )) || (
-                        <Text style={TextStyles.paragraph}>No data available</Text>
-                    )}
+                {goodThings.length > 0 ? (
+                    goodThings.map((item, index) => (
+                        <Text key={index} style={TextStyles.paragraph}>• {item}</Text>
+                    ))
+                ) : (
+                    <Text style={TextStyles.paragraph}>No good habits available</Text>
+                )}
 
                 <Text style={TextStyles.heading3}>5 Bad Things</Text>
-                {userInfo.badThings?.map((item, index) => (
-                    <Text key={index} style={TextStyles.paragraph}>• {item}</Text>
-                )) || (
-                        <Text style={TextStyles.paragraph}>No data available</Text>
-                    )}
+                {badThings.length > 0 ? (
+                    badThings.map((item, index) => (
+                        <Text key={index} style={TextStyles.paragraph}>• {item}</Text>
+                    ))
+                ) : (
+                    <Text style={TextStyles.paragraph}>No bad habits available</Text>
+                )}
             </CustomCard>
 
             {/* Update Button */}
