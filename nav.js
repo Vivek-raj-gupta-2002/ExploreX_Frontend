@@ -46,7 +46,7 @@ export default function BottomNavBar() {
         const checkAuthStatus = async () => {
             try {
                 const token = await getData('userToken');
-                console.log("Token:", token); // Debugging: Check if token is fetched
+                // console.log("Token:", token); // Debugging: Check if token is fetched
                 setIsAuth(!!token); // Update isAuth based on whether a token exists
             } catch (error) {
                 console.error("Error fetching token:", error);

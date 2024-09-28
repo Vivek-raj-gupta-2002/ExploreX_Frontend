@@ -44,13 +44,14 @@ export const createOrUpdateProfile = async (inputData, email) => {
 
         if (!response.ok) {
             const errorData = await response.json(); // Get error data for debugging
-            throw new Error(errorData.error || 'Network response was not ok');
+            // throw new Error(errorData.error || 'Network response was not ok');
+            return null
         }
 
         const data = await response.json(); // Parse the response data
         return data; // Return the updated or created user profile data
     } catch (error) {
-        console.error('Error creating or updating user profile:', error); // Log error for debugging
+        // console.error('Error creating or updating user profile:', error); // Log error for debugging
         return null; // Return null for further handling in the component
     }
 };
