@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, KeyboardAvoidingView } from 'react-native';
 import CustomIconButton from '../../../components/iconButton';
 import CustomTextInput from '../../../components/input';
+import TextStyles from '../../../styles/textStyles';
 
 const ChatScreen = ({ navigation, route }) => {
     const { groupName } = route.params;
@@ -65,10 +66,7 @@ const ChatScreen = ({ navigation, route }) => {
 
     return (
         <KeyboardAvoidingView style={styles.container} behavior="padding">
-            {/* Header with Back Button */}
-            <View style={styles.header}>
-                <Text style={styles.chatTitle}>{groupName}</Text>
-            </View>
+            
 
             {/* Chat Content */}
             <View style={styles.chatContent}>
