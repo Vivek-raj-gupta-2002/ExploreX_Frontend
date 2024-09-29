@@ -1,4 +1,5 @@
 import { API_HOST } from '@env';
+import { getData } from './storage';
 
 const API_URL_GET = `${API_HOST}/api/profiles`;
 const API_URL_UPDATE = `${API_HOST}/api/profiles/update/`;
@@ -7,8 +8,16 @@ const API_URL_UPDATE = `${API_HOST}/api/profiles/update/`;
 
 // Function to get a specific user profile by email
 export const getUserProfile = async (email) => {
+
     try {
-        const response = await fetch(`${API_URL_GET}/?email=${email}`);
+        const token = await getData('access');
+        const response = await fetch(`${API_URL_GET}/?email=${email}`, {
+            headers: {
+                'method': 'GET',
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        });
 
         if (!response.ok) {
             throw new Error('Network response was not ok');
@@ -24,7 +33,6 @@ export const getUserProfile = async (email) => {
 // Function to create or update user profile, including data handling
 export const createOrUpdateProfile = async (inputData, email) => {
     // Destructure input data for clarity
-    
 
     // Prepare the profile data object
     const profileData = {
@@ -33,10 +41,12 @@ export const createOrUpdateProfile = async (inputData, email) => {
     };
 
     try {
+        const token = await getData('access');
         // Send the profile data as a POST request to create or update the profile
         const response = await fetch(API_URL_UPDATE, {
             method: 'POST',
             headers: {
+                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(profileData), // Send the profile data as JSON
