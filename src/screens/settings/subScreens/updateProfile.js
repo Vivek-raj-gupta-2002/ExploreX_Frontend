@@ -1,20 +1,24 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, ScrollView, Alert, StyleSheet } from 'react-native';
+import { View, Text, TextInput, ScrollView, Alert, StyleSheet, Platform } from 'react-native';
 import CustomButton from '../../../components/button';
 import TextStyles from '../../../styles/textStyles';
 import { createOrUpdateProfile } from '../../../scripts/profileAPI';
 import { storeData } from '../../../scripts/storage';
+import DateTimePicker from '@react-native-community/datetimepicker'; // Ensure this is installed correctly
 
 const UpdateProfileScreen = ({ navigation, route }) => {
     const { userProfile } = route.params;
-    const { email, bio: initialBio, goodThings: initialGoodThings, badThings: initialBadThings } = userProfile || {
+    const { email, bio: initialBio, goodThings: initialGoodThings, badThings: initialBadThings, dob: initialDob } = userProfile || {
         email: '',
         bio: '',
         goodThings: [],
         badThings: [],
+        dob: '',
     };
 
     const [bio, setBio] = useState(initialBio || '');
+    const [dob, setDob] = useState(initialDob || '');
+    const [showDobPicker, setShowDobPicker] = useState(false);  // State for Date Picker visibility
     const [goodThings, setGoodThings] = useState(
         Array.isArray(initialGoodThings) && initialGoodThings.length ? initialGoodThings : ['', '', '', '', '']
     );
@@ -28,14 +32,25 @@ const UpdateProfileScreen = ({ navigation, route }) => {
             return;
         }
 
-        if (goodThings.every(item => !item.trim()) || badThings.every(item => !item.trim())) {
-            Alert.alert('Error', 'Please enter at least one good and bad habit.');
+        if (!dob.trim()) {
+            Alert.alert('Error', 'Please enter your date of birth.');
+            return;
+        }
+
+        if (goodThings.some(item => !item.trim())) {
+            Alert.alert('Error', 'Please fill out all good habit fields.');
+            return;
+        }
+
+        if (badThings.some(item => !item.trim())) {
+            Alert.alert('Error', 'Please fill out all bad habit fields.');
             return;
         }
 
         const profileData = {
             email,
             bio,
+            dob,
             bad_habit_1: badThings[0],
             bad_habit_2: badThings[1],
             bad_habit_3: badThings[2],
@@ -48,11 +63,9 @@ const UpdateProfileScreen = ({ navigation, route }) => {
             good_habit_5: goodThings[4],
         };
 
-        // Call the API to create or update the profile
         const result = await createOrUpdateProfile(profileData, email);
 
         if (result) {
-            // Store the updated profile data in AsyncStorage
             await storeData('userProfile', JSON.stringify(profileData));
             Alert.alert('Success', 'Profile updated successfully!');
             navigation.goBack();
@@ -73,6 +86,12 @@ const UpdateProfileScreen = ({ navigation, route }) => {
         setBadThings(updatedBadThings);
     };
 
+    const handleDobChange = (event, selectedDate) => {
+        const currentDate = selectedDate || new Date(dob);
+        setShowDobPicker(Platform.OS === 'ios');
+        setDob(currentDate.toISOString().split('T')[0]);
+    };
+
     return (
         <View style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -84,6 +103,24 @@ const UpdateProfileScreen = ({ navigation, route }) => {
                     placeholder="Enter your bio"
                     multiline
                 />
+
+                <Text style={TextStyles.subheading}>Date of Birth</Text>
+                <View>
+                    <TextInput
+                        style={styles.input}
+                        value={dob}
+                        placeholder="Select your date of birth"
+                        onFocus={() => setShowDobPicker(true)}
+                    />
+                    {showDobPicker && (
+                        <DateTimePicker
+                            value={dob ? new Date(dob) : new Date()}
+                            mode="date"
+                            display="default"
+                            onChange={handleDobChange}
+                        />
+                    )}
+                </View>
 
                 <Text style={TextStyles.subheading}>5 Good Things</Text>
                 {goodThings.map((item, index) => (

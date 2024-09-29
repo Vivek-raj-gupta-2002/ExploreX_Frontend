@@ -25,7 +25,7 @@ export const getUserProfile = async (email) => {
         const data = await response.json();
         return data; // Return the user's profile data
     } catch (error) {
-        console.error('Error fetching user profile:', error); // Log error for debugging
+        // console.error('Error fetching user profile:', error); // Log error for debugging
         return null; // Return null for further handling in the component
     }
 };
@@ -39,7 +39,7 @@ export const createOrUpdateProfile = async (inputData, email) => {
         email, // Include email as part of the profile data
         inputData
     };
-
+    // console.log(profileData)
     try {
         const token = await getData('access');
         // Send the profile data as a POST request to create or update the profile
