@@ -3,71 +3,42 @@ import { View, Text, StyleSheet, FlatList, KeyboardAvoidingView } from 'react-na
 import CustomIconButton from '../../../components/iconButton';
 import CustomTextInput from '../../../components/input';
 import TextStyles from '../../../styles/textStyles';
+import {useChat} from '../../../scripts/useChat';  // Import useChat hook
+import { getData } from '../../../scripts/storage';
 
 const ChatScreen = ({ navigation, route }) => {
-    const { groupName } = route.params;
+    const { groupName, chatId, token, email } = route.params;  // Assuming chatId and token are passed via route params
+    
     const [message, setMessage] = useState('');
-    const [messages, setMessages] = useState([]);
     const flatListRef = useRef(null);
+
+    // Use the useChat hook to handle WebSocket connection and real-time messaging
+    const { messages, sendMessage } = useChat(chatId, token, email);
+
+
+    // Scroll to the bottom of the FlatList when messages update
+    useEffect(() => {
+        flatListRef.current?.scrollToEnd({ animated: true });
+    }, [messages]);
 
     const handleSend = () => {
         if (message.trim()) {
-            const timestamp = new Date().toLocaleTimeString();
-            // Add the message as a sent message
-            setMessages(prevMessages => [
-                ...prevMessages,
-                { text: message.trim(), sent: true, time: timestamp }
-            ]);
-            setMessage(''); // Clear input field
-
-            // Simulate receiving a message after sending
-            simulateReceiveMessage();
-
-            // Scroll to the bottom after updating messages
-            setTimeout(() => {
-                flatListRef.current.scrollToEnd({ animated: true });
-            }, 100);
+            sendMessage(message.trim());  // Send message through WebSocket
+            setMessage('');  // Clear input field
         }
     };
 
-    const simulateReceiveMessage = () => {
-        const randomMessages = [
-            "Hello! How are you?",
-            "What are you doing?",
-            "Let's catch up soon!",
-            "Do you have any plans for the weekend?",
-            "That's interesting!"
-        ];
-        const randomMessage = randomMessages[Math.floor(Math.random() * randomMessages.length)];
-        const timestamp = new Date().toLocaleTimeString();
-
-        // Add a delay before simulating the received message
-        setTimeout(() => {
-            setMessages(prevMessages => [
-                ...prevMessages,
-                { text: randomMessage, sent: false, time: timestamp }
-            ]);
-            flatListRef.current.scrollToEnd({ animated: true });
-        }, 2000); // Simulate receiving message after 2 seconds
-    };
-
     const renderMessage = ({ item }) => (
-        <View style={item.sent ? styles.sentMessageBubble : styles.receivedMessageBubble}>
-            <Text style={item.sent ? styles.sentMessageText : styles.receivedMessageText}>
-                {item.text}
+        <View style={item.sender ? styles.sentMessageBubble : styles.receivedMessageBubble}>
+            <Text style={item.sender ? styles.sentMessageText : styles.receivedMessageText}>
+                {item.message}
             </Text>
             <Text style={styles.messageTime}>{item.time}</Text>
         </View>
     );
 
-    useEffect(() => {
-        flatListRef.current.scrollToEnd({ animated: true });
-    }, [messages]);
-
     return (
         <KeyboardAvoidingView style={styles.container} behavior="padding">
-            
-
             {/* Chat Content */}
             <View style={styles.chatContent}>
                 <FlatList
@@ -75,7 +46,6 @@ const ChatScreen = ({ navigation, route }) => {
                     data={messages}
                     keyExtractor={(item, index) => index.toString()}
                     renderItem={renderMessage}
-                    
                 />
             </View>
 
@@ -102,18 +72,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: 'white',
-    },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        padding: 10,
-        backgroundColor: '#f1f1f1',
-    },
-    chatTitle: {
-        flex: 1,
-        fontSize: 20,
-        fontWeight: 'bold',
-        textAlign: 'center',
     },
     chatContent: {
         flex: 1,

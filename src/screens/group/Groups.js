@@ -1,21 +1,34 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import TextStyles from '../../styles/textStyles'; // Import your predefined text styles
+import { fetchChats } from '../../scripts/useChat';
+import { getData } from '../../scripts/storage';
 
 const GroupScreen = ({ navigation }) => {
+
+    const [groups, setGroups] = useState([]);
+    const [token, setToken] = useState();
+    const [email, setemail] = useState();
+
     // Example group data
-    const groups = [
-        { id: '1', name: 'Family', messages: 5 },
-        { id: '2', name: 'Friends', messages: 12 },
-        { id: '3', name: 'Work Team', messages: 2 },
-        { id: '4', name: 'Coding Buddies', messages: 9 },
-        { id: '5', name: 'Weekend Hikers', messages: 0 },
-        { id: '6', name: 'Sports Club', messages: 3 },
-        { id: '7', name: 'Book Club', messages: 8 },
-        { id: '8', name: 'Study Group', messages: 1 },
-        { id: '9', name: 'Gaming Crew', messages: 4 },
-        { id: '10', name: 'Music Lovers', messages: 7 },
-    ];
+    useEffect(() => {
+        const getChats = async () => {
+            const data = await fetchChats();
+            const token = await getData('access');
+            const emailMy = JSON.parse(await getData('userDetails')).email;
+            setGroups(data);
+            setToken(token);
+            setemail(emailMy);
+        }
+        getChats();
+        const unsubscribe = navigation.addListener('focus', () => {
+            getChats();
+        })
+    }, [])
+    // const groups = [
+    //     { id: '1', name: 'Family', messages: 5 },
+        
+    // ];
 
     return (
         <View style={styles.container}>
@@ -26,18 +39,12 @@ const GroupScreen = ({ navigation }) => {
                     <TouchableOpacity
                         key={group.id}
                         style={styles.groupItem}
-                        onPress={() => { navigation.navigate('chat', {groupName: group.name})}}
+                        onPress={() => { navigation.navigate('chat', { groupName: group.title, chatId : group.id, token: token, email: email})}}
                     >
                         <View style={styles.groupInfo}>
-                            <Text style={TextStyles.paragraph}>{group.name}</Text>
+                            <Text style={TextStyles.paragraph}>{group.title}</Text>
                         </View>
-                        {group.messages > 0 && (
-                            <View style={styles.badge}>
-                                <Text style={styles.badgeText}>
-                                    {group.messages > 5 ? '5+' : group.messages}
-                                </Text>
-                            </View>
-                        )}
+                        
                     </TouchableOpacity>
                 ))}
             </ScrollView>
