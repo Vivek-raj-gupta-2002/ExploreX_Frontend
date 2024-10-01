@@ -4,6 +4,7 @@ import GroupScreen from './Groups';
 import ChatScreen from './subScreens/chat'; // Assuming you want to navigate to chat
 import CustomButton from '../../components/button';
 import CustomIconButton from '../../components/iconButton';
+import { confirmDeleteChat } from '../../scripts/useChat'
 
 const GroupStack = createNativeStackNavigator();
 
@@ -19,7 +20,11 @@ function GroupNav() {
                     title: route.params.groupName, // Dynamic title for Chat
                     headerRight: () => (
                         <CustomIconButton
-                            onPress={() => alert('Button pressed!')} // Action for button
+                            onPress={() => confirmDeleteChat(
+                                route.params.chatId, 
+                                route.params.token,
+                                navigation
+                            )} // Action for button
                             iconName="exit-outline"
                             color="tomato" // Change button color if needed
                             
