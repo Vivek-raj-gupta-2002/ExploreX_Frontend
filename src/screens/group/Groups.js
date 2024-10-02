@@ -1,50 +1,68 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
-import TextStyles from '../../styles/textStyles'; // Import your predefined text styles
+import TextStyles from '../../styles/textStyles';
 import { fetchChats } from '../../scripts/useChat';
 import { getData } from '../../scripts/storage';
 
 const GroupScreen = ({ navigation }) => {
-
     const [groups, setGroups] = useState([]);
     const [token, setToken] = useState();
-    const [email, setemail] = useState();
+    const [user, setUser] = useState();
 
-    // Example group data
     useEffect(() => {
         const getChats = async () => {
-            const data = await fetchChats();
-            const token = await getData('access');
-            const emailMy = JSON.parse(await getData('userDetails')).email;
-            setGroups(data);
-            setToken(token);
-            setemail(emailMy);
-        }
+            try {
+                const [data, tokenValue, userInfoJson] = await Promise.all([
+                    fetchChats(),
+                    getData('access'),
+                    getData('userDetails')
+                ]);
+
+                const userInfo = JSON.parse(userInfoJson);
+                setGroups(data);
+                setToken(tokenValue);
+                setUser(userInfo);
+            } catch (error) {
+                console.error("Failed to load chats or user info:", error);
+            }
+        };
+
         getChats();
-        const unsubscribe = navigation.addListener('focus', () => {
-            getChats();
-        })
-    }, [])
-    // const groups = [
-    //     { id: '1', name: 'Family', messages: 5 },
-        
-    // ];
+
+        const unsubscribe = navigation.addListener('focus', getChats);
+        return unsubscribe;
+    }, [navigation]);
+
+    const navigateToChat = (groupName, chatId) => {
+        navigation.navigate('chat', { groupName, chatId, token, email: user.email });
+    };
+
+    const getUserSpecificAiRoomId = (userId) => `AI`;
 
     return (
         <View style={styles.container}>
-            {/* <Text style={TextStyles.heading2}>Your Groups</Text> */}
-
             <ScrollView contentContainerStyle={styles.scrollView}>
+                {/* AI Chat Room with a unique user-specific ID */}
+                <TouchableOpacity
+                    key={"AI"}
+                    style={styles.groupItem}
+                    onPress={() => navigateToChat("AI Chat", getUserSpecificAiRoomId(user.id))}
+                >
+                    <View style={styles.groupInfo}>
+                        <Text style={TextStyles.paragraph}>AI Chat</Text>
+                    </View>
+                </TouchableOpacity>
+
+                {/* Dynamically loaded group chats */}
                 {groups.map((group) => (
                     <TouchableOpacity
                         key={group.id}
                         style={styles.groupItem}
-                        onPress={() => { navigation.navigate('chat', { groupName: group.title, chatId : group.id, token: token, email: email})}}
+                        onPress={() => navigateToChat(group.title, group.id)}
                     >
                         <View style={styles.groupInfo}>
                             <Text style={TextStyles.paragraph}>{group.title}</Text>
                         </View>
-                        
                     </TouchableOpacity>
                 ))}
             </ScrollView>
@@ -62,7 +80,7 @@ const styles = StyleSheet.create({
         paddingBottom: 20,
     },
     groupItem: {
-        flexDirection: 'row', // Align items horizontally
+        flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingVertical: 15,
@@ -72,19 +90,6 @@ const styles = StyleSheet.create({
     },
     groupInfo: {
         flex: 1,
-    },
-    badge: {
-        backgroundColor: 'tomato',
-        borderRadius: 12, // Makes it circular when width/height are equal
-        width: 24,
-        height: 24,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    badgeText: {
-        color: 'white',
-        fontSize: 12,
-        fontWeight: 'bold',
     },
 });
 

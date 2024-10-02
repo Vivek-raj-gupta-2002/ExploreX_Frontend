@@ -50,7 +50,7 @@ export const useChat = (chatId, token, email) => {
             const d = new Date();
             let time = d.toLocaleTimeString();
             messageData.time = time;
-
+            
             // Update messages state and store new message in AsyncStorage
             setMessages((prevMessages) => {
                 const updatedMessages = [...prevMessages, messageData];
