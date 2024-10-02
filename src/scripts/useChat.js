@@ -112,11 +112,11 @@ export const fetchChats = async () => {
             return data; // Return fetched chat data
         } else {
             console.error('Failed to fetch chats', response.status);
-            return null; // Return null on failure
+            return []; // Return null on failure
         }
     } catch (error) {
         console.error('Error fetching chats:', error);
-        return null; // Return null on error
+        return []; // Return null on error
     }
 };
 

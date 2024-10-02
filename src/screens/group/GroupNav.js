@@ -11,7 +11,11 @@ const GroupStack = createNativeStackNavigator();
 function GroupNav() {
     return (
         <GroupStack.Navigator>
-            <GroupStack.Screen name="Groups" component={GroupScreen} />
+            <GroupStack.Screen
+                name="Groups"
+                component={GroupScreen}
+                options={{ title: "Chats" }}
+            />
 
             <GroupStack.Screen
                 name="chat"
