@@ -7,7 +7,7 @@ import TextStyles from '../../../styles/textStyles';
 import { createNotesEntry, getNotesEntry } from '../../../scripts/noteScript'; // Import your API functions
 import moment from 'moment';
 
-const NotesScreen = () => {
+const NotesScreen = ({ navigation }) => {
     const [note, setNote] = useState('');
     const [date, setDate] = useState(moment().format('YYYY-MM-DD')); // Get the current date
 
@@ -30,7 +30,8 @@ const NotesScreen = () => {
         }
 
         await createNotesEntry(note); // Call the API to save the note
-        Alert.alert('Success', 'Note saved successfully!'); // Confirmation alert
+        // Alert.alert('Success', 'Note saved successfully!'); // Confirmation alert
+        navigation.navigate('Home');
         
     };
 
