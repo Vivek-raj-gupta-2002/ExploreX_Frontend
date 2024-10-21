@@ -71,14 +71,16 @@ const HomeScreen = ({ navigation }) => {
         const fetchData = async () => {
             const data = await getGoodBadEntry(date);
             if (data) {
-                setGood(data.good);
-                setBad(data.bad);
+                setGood(data.good || '');
+                setBad(data.bad || '');
             } else {
                 setGood('');
                 setBad('');
             }
         };
         fetchData();
+        const unsubscribe = navigation.addListener('focus', fetchData);
+        return unsubscribe;
     }, [date]);
 
     const handleSubmit = async () => {
@@ -87,7 +89,7 @@ const HomeScreen = ({ navigation }) => {
             return;
         }
 
-        await createGoodBadEntry(good, bad, date);
+        await createGoodBadEntry(good, bad);
         alert('Your entry has been submitted!');
     };
 

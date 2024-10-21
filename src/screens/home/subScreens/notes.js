@@ -1,16 +1,37 @@
 // src/screens/NotesScreen.js
 
-import React, { useState } from 'react';
-import { StyleSheet, View, Text, TextInput, Button, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, Text, TextInput, ScrollView, Alert } from 'react-native';
 import CustomButton from '../../../components/button';
 import TextStyles from '../../../styles/textStyles';
+import { createNotesEntry, getNotesEntry } from '../../../scripts/noteScript'; // Import your API functions
+import moment from 'moment';
 
 const NotesScreen = () => {
     const [note, setNote] = useState('');
+    const [date, setDate] = useState(moment().format('YYYY-MM-DD')); // Get the current date
 
-    const handleSave = () => {
-        // Handle saving the note (e.g., store in state, local storage, etc.)
-        console.log('Note saved:', note);
+    useEffect(() => {
+        const fetchNotes = async () => {
+            const notes = await getNotesEntry(date); // Fetch notes for the current date
+            if (notes) {
+                console.log(notes, 111)
+                setNote(notes.note || ''); // Update the note state with the fetched data
+            }
+        };
+
+        fetchNotes(); // Call the fetch function
+    }, [date]);
+
+    const handleSave = async () => {
+        if (!note.trim()) {
+            Alert.alert('Warning', 'Please write a note before saving.'); // Alert for empty note
+            return;
+        }
+
+        await createNotesEntry(note); // Call the API to save the note
+        Alert.alert('Success', 'Note saved successfully!'); // Confirmation alert
+        
     };
 
     return (
@@ -21,7 +42,7 @@ const NotesScreen = () => {
                 multiline
                 placeholder="Dear Diary....."
                 value={note}
-                onChangeText={setNote}
+                onChangeText={setNote} // Update state on text change
             />
             <CustomButton title="Done" onPress={handleSave} />
         </ScrollView>
@@ -33,11 +54,6 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 20,
         backgroundColor: '#fff',
-    },
-    heading: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 10,
     },
     textInput: {
         height: "85%",
