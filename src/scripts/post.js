@@ -1,6 +1,32 @@
 import { API_HOST } from '@env';
 import { getData } from './storage';
 
+export const GetPost = async () => {
+    try {
+        const token = await getData('access');
+        const response = await fetch(`${API_HOST}/api/get_posts/`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,  // Pass JWT token for authentication
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (response.ok) {
+            const jsonResponse = await response.json();
+            // console.log('notes posts retrieved successfully:', jsonResponse);
+            return jsonResponse;  // Return the retrieved data
+        } else {
+            console.error('Failed to retrieve posts entry:', response.status);
+            return null;  // Return null in case of failure
+        }
+    } catch (error) {
+        console.error('Error retrieving posts entry:', error);
+        return null;  // Return null in case of error
+    }
+};
+
+
 // Function to handle API POST requests
 export const CreatePost = async (data) => {
     try {
