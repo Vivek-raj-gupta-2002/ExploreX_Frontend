@@ -1,11 +1,11 @@
-// src/screens/AddPostScreen.js
-
 import React, { useState } from 'react';
 import { View, TextInput, TouchableOpacity, Image, StyleSheet, Text } from 'react-native';
 import * as ImagePicker from 'expo-image-picker'; // To pick images from the device
 import CustomButton from '../../../components/button'; // Assuming you have a custom button component
+import { CreatePost } from '../../../scripts/post';
+import mime from 'mime'; // For dynamically determining MIME types
 
-const AddPostScreen = ({ navigation, route }) => {
+const AddPostScreen = ({ navigation }) => {
     const [description, setDescription] = useState('');
     const [selectedImage, setSelectedImage] = useState(null);
 
@@ -17,7 +17,7 @@ const AddPostScreen = ({ navigation, route }) => {
             return;
         }
 
-        // Open image picker
+        // Open image picker and allow multiple image formats
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
             allowsEditing: true,
@@ -29,23 +29,38 @@ const AddPostScreen = ({ navigation, route }) => {
         }
     };
 
-    const handlePostSubmit = () => {
+    const handlePostSubmit = async () => {
         if (!description || !selectedImage) {
             alert('Please add a description and an image.');
             return;
         }
 
-        // Pass the post data to the Feed screen (or save it in a backend/database)
-        route.params.addPost({
-            id: Date.now().toString(),
-            userName: 'new_user', // Replace with actual user info
-            profileImage: 'https://randomuser.me/api/portraits/men/32.jpg', // Example profile image
-            postImage: selectedImage,
-            description: description,
-        });
+        try {
+            const newImageUri = "file:///" + selectedImage.split("file:/").join("");
+            const mimeType = mime.getType(newImageUri); // Dynamically fetch MIME type based on file extension
 
-        // Navigate back to the feed screen
-        navigation.goBack();
+            let data = new FormData();
+            data.append('image', {
+                uri: newImageUri,
+                type: mimeType, // Add MIME type dynamically
+                name: newImageUri.split("/").pop(), // Extract file name from URI
+            });
+            data.append('description', description);
+            data.append('title', "A Post Title"); // Adjust title dynamically if needed
+
+            // Call CreatePost API function to upload the post
+            const response = await CreatePost(data);
+
+            if (response) {
+                console.log('Post created successfully:', response);
+                navigation.goBack(); // Navigate back after successful post creation
+            } else {
+                alert('Failed to create post.');
+            }
+        } catch (error) {
+            console.error('Error submitting post:', error);
+            alert('An error occurred while creating the post.');
+        }
     };
 
     return (
