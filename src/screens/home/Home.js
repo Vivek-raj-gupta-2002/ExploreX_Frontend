@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Text, StyleSheet, View, ScrollView, FlatList, Image, TouchableOpacity } from 'react-native';
 import CustomCard from '../../components/card';
 import CustomTextInput from '../../components/input';
@@ -6,6 +6,8 @@ import CustomButton from '../../components/button';
 import TextStyles from '../../styles/textStyles';
 import CustomIconButton from '../../components/iconButton';
 import LikeDislikeButton from '../../components/likeDisklike';
+import { createGoodBadEntry, getGoodBadEntry } from '../../scripts/goodBad'; // Import the API calls
+import moment from 'moment';
 
 // Sample data for the music slider
 const musicSuggestions = [
@@ -60,14 +62,55 @@ const renderMusicItem = ({ item }) => (
 );
 
 const HomeScreen = ({ navigation }) => {
+    const [good, setGood] = useState('');
+    const [bad, setBad] = useState('');
+    const [date, setDate] = useState(moment().format('YYYY-MM-DD'));
+
+    useEffect(() => {
+        // Fetch data for the current date
+        const fetchData = async () => {
+            const data = await getGoodBadEntry(date);
+            if (data) {
+                setGood(data.good);
+                setBad(data.bad);
+            } else {
+                setGood('');
+                setBad('');
+            }
+        };
+        fetchData();
+    }, [date]);
+
+    const handleSubmit = async () => {
+        if (!good.trim() || !bad.trim()) {
+            alert('Please fill in both fields before submitting!');
+            return;
+        }
+
+        await createGoodBadEntry(good, bad, date);
+        alert('Your entry has been submitted!');
+    };
+
     return (
         <View style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollContainer}>
                 {/* Section for User Input */}
                 <CustomCard cardStyle={styles.card}>
-                    <CustomTextInput margin={10} width="90%" placeholder="Anything Good!!!!!" />
-                    <CustomTextInput margin={10} width="90%" placeholder="Anything Not Good!!!!" />
-                    <CustomButton title="Submit" />
+                    <CustomTextInput
+                        margin={10}
+                        width="90%"
+                        placeholder="Anything Good!!!!!"
+                        value={good}
+                        onChangeText={(text) => setGood(text)} // Update state
+                    />
+                    <CustomTextInput
+                        margin={10}
+                        width="90%"
+                        placeholder="Anything Not Good!!!!"
+                        value={bad}
+                        onChangeText={(text) => setBad(text)} // Update state
+                    />
+                    <CustomButton title="Submit" onPress={handleSubmit} />
                 </CustomCard>
 
                 {/* Section for Recommended Activities */}
@@ -85,7 +128,6 @@ const HomeScreen = ({ navigation }) => {
                         />
                     </CustomCard>
                     <CustomButton textColor="grey" backgroundColor="white" title="Leader Board" onPress={() => { navigation.navigate('Leader Board') }} />
-
                 </CustomCard>
 
                 {/* About your Personality */}
@@ -103,8 +145,8 @@ const HomeScreen = ({ navigation }) => {
                         data={musicSuggestions}
                         renderItem={renderMusicItem}
                         keyExtractor={(item) => item.id}
-                        horizontal={true} // Set to horizontal
-                        showsHorizontalScrollIndicator={false} // Hide scroll indicator
+                        horizontal={true}
+                        showsHorizontalScrollIndicator={false}
                         style={styles.musicSlider}
                     />
                 </CustomCard>

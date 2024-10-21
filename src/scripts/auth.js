@@ -1,5 +1,6 @@
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { clearStorage, removeData, storeData } from './storage'; // Assuming storage script for async storage handling
+import { API_HOST } from '@env';
 
 export const handleLogout = async (navigation) => {
     try {
@@ -25,7 +26,7 @@ export const signInWithGoogle = async (navigation) => {
         const idToken = userInfo.data;
 
         // Send ID token to the backend using fetch
-        const response = await fetch('http://192.168.29.41/api/google-login/', {
+        const response = await fetch(`${API_HOST}/api/google-login/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
