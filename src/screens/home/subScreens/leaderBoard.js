@@ -42,10 +42,10 @@ const LeaderScreen = () => {
         <View style={styles.container}>
             {/* User Info */}
             <View style={styles.userInfo}>
-                {/* <Image
-                    source={{ uri: item.profileImage }}
+                <Image
+                    source={{ uri: item.user_pic }}
                     style={styles.profileImage}
-                /> */}
+                />
                 <Text style={styles.userName}>{item.username}</Text>
             </View>
 
@@ -95,8 +95,8 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
     },
     profileImage: {
-        width: 50,
-        height: 50,
+        width: 30,
+        height: 30,
         borderRadius: 25,
     },
     userName: {

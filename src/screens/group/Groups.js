@@ -22,6 +22,8 @@ const GroupScreen = ({ navigation }) => {
                 setGroups(data);
                 setToken(tokenValue);
                 setUser(userInfo);
+
+                
             } catch (error) {
                 console.error("Failed to load chats or user info:", error);
             }
@@ -37,14 +39,14 @@ const GroupScreen = ({ navigation }) => {
         navigation.navigate('chat', { groupName, chatId, token, email: user.email });
     };
 
-    const getUserSpecificAiRoomId = (userId) => `AI`;
+    const getUserSpecificAiRoomId = (userId) => `AI_${userId}`;
 
     return (
         <View style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollView}>
                 {/* AI Chat Room with a unique user-specific ID */}
                 <TouchableOpacity
-                    key={"AI"}
+                    key={`AI`}
                     style={styles.groupItem}
                     onPress={() => navigateToChat("AI Chat", getUserSpecificAiRoomId(user.id))}
                 >
