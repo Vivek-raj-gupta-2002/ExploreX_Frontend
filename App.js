@@ -4,9 +4,10 @@ import { StyleSheet, View } from 'react-native';
 import BottomNavBar from './nav';
 import { SafeAreaView } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
+import { API_HOST, CHAT_HOST } from '@env';
 
 export default function App() {
-
+  console.log(API_HOST, CHAT_HOST)
 
   return (
     <>
