@@ -8,6 +8,8 @@ import CustomIconButton from '../../components/iconButton';
 import LikeDislikeButton from '../../components/likeDisklike';
 import { createGoodBadEntry, getGoodBadEntry } from '../../scripts/goodBad'; // Import the API calls
 import moment from 'moment';
+import { GetSummary } from '../../scripts/userSummary';
+import { storeData } from '../../scripts/storage';
 
 // Sample data for the music slider
 const musicSuggestions = [
@@ -62,13 +64,30 @@ const renderMusicItem = ({ item }) => (
 );
 
 const HomeScreen = ({ navigation }) => {
+    const [task, setTask] = useState([]);
     const [good, setGood] = useState('');
     const [bad, setBad] = useState('');
     const [date, setDate] = useState(moment().format('YYYY-MM-DD'));
+    const [summ, setSumm] = useState(null);
 
     useEffect(() => {
         // Fetch data for the current date
         const fetchData = async () => {
+            const userSum = await GetSummary();
+
+            if (userSum != null) {
+                await storeData('userSum', userSum);
+                setSumm(userSum);
+                if (userSum?.task != null) {
+                    // Split tasks and only take the heading (first line)
+                    const tasks = userSum.task
+                        .trim()
+                        .split(/\n\n/) // Split by double newlines
+                        .map(task => task.split('\n')[0].trim()); // Extract only the first line of each task as the heading
+                    setTask(tasks);
+                }
+            }
+
             const data = await getGoodBadEntry(date);
             if (data) {
                 setGood(data.good || '');
@@ -83,6 +102,7 @@ const HomeScreen = ({ navigation }) => {
         return unsubscribe;
     }, [date]);
 
+
     const handleSubmit = async () => {
         if (!good.trim() || !bad.trim()) {
             alert('Please fill in both fields before submitting!');
@@ -92,6 +112,20 @@ const HomeScreen = ({ navigation }) => {
         await createGoodBadEntry(good, bad);
         alert('Your entry has been submitted!');
     };
+
+    const renderTaskItem = ({ item }) => (
+        <CustomCard cardStyle={styles.activityContainer}>
+            <Text style={TextStyles.subheading}>{item}</Text>
+            <CustomIconButton
+                iconName="camera"
+                iconColor="white"
+                backgroundColor="tomato"
+                iconSize={20}
+                style={styles.iconButton}
+                onPress={() => { navigation.navigate('New Post') }}
+            />
+        </CustomCard>
+    );
 
     return (
         <View style={styles.container}>
@@ -118,25 +152,21 @@ const HomeScreen = ({ navigation }) => {
                 {/* Section for Recommended Activities */}
                 <CustomCard cardStyle={styles.card}>
                     <Text style={TextStyles.heading3}>Recommended Activities</Text>
-                    <CustomCard cardStyle={styles.activityContainer}>
-                        <Text style={TextStyles.subheading}>Activity 1</Text>
-                        <CustomIconButton
-                            iconName="camera"
-                            iconColor="white"
-                            backgroundColor="tomato"
-                            iconSize={20}
-                            style={styles.iconButton}
-                            onPress={() => { navigation.navigate('New Post') }}
-                        />
-                    </CustomCard>
+                    <FlatList
+                        data={task}
+                        renderItem={renderTaskItem}
+                        keyExtractor={(item, index) => index.toString()}
+                        showsVerticalScrollIndicator={false}
+                        style={styles.taskList}
+                    />
                     <CustomButton textColor="grey" backgroundColor="white" title="Leader Board" onPress={() => { navigation.navigate('Leader Board') }} />
                 </CustomCard>
 
                 {/* About your Personality */}
                 <CustomCard cardStyle={styles.card}>
                     <Text style={TextStyles.heading3}>Your Personality Says</Text>
-                    <Text style={TextStyles.paragraph}>1. You are a Good and polite Person</Text>
-                    <Text style={TextStyles.paragraph}>2. You love to interact with people</Text>
+                    <Text style={TextStyles.paragraph}>{`${summ?.personality || "Nothing to say"}`}</Text>
+
                     <LikeDislikeButton onLike={() => console.log("Liked")} onDislike={() => console.log("DisLiked")} />
                 </CustomCard>
 
@@ -218,6 +248,9 @@ const styles = StyleSheet.create({
     },
     musicSlider: {
         paddingVertical: 10,
+    },
+    taskList: {
+        marginTop: 10,
     },
     floatingButton: {
         position: 'absolute',
