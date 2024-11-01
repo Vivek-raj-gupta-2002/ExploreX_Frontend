@@ -21,7 +21,7 @@ class ScreenTimeModule(reactContext: ReactApplicationContext) : ReactContextBase
         return "ScreenTimeModule"
     }
 
-    @ReactMethod
+   @ReactMethod
     fun getScreenTimeData(promise: Promise) {
         val appOps = reactApplicationContext.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
         val mode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -41,14 +41,23 @@ class ScreenTimeModule(reactContext: ReactApplicationContext) : ReactContextBase
         val usageStatsManager = reactApplicationContext.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
 
         // Set start time to midnight of the current day
-        val calendar = Calendar.getInstance().apply {
+        val calendarStart = Calendar.getInstance().apply {
             set(Calendar.HOUR_OF_DAY, 0)
             set(Calendar.MINUTE, 0)
             set(Calendar.SECOND, 0)
             set(Calendar.MILLISECOND, 0)
         }
-        val startTime = calendar.timeInMillis
-        val endTime = System.currentTimeMillis()
+        val startTime = calendarStart.timeInMillis
+
+        // Set end time to midnight of the next day
+        val calendarEnd = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+            add(Calendar.DAY_OF_MONTH, 1) // Move to the next day
+        }
+        val endTime = calendarEnd.timeInMillis
 
         val stats: List<UsageStats> = usageStatsManager.queryUsageStats(
             UsageStatsManager.INTERVAL_DAILY,
@@ -56,11 +65,29 @@ class ScreenTimeModule(reactContext: ReactApplicationContext) : ReactContextBase
             endTime
         )
 
-        val appUsageMap = WritableNativeMap()
+        // Map to store app usage times
+        val appUsageMap = mutableMapOf<String, Long>()
         for (usageStat in stats) {
-            appUsageMap.putDouble(usageStat.packageName, (usageStat.totalTimeInForeground / 1000).toDouble())
+            appUsageMap[usageStat.packageName] = usageStat.totalTimeInForeground
         }
 
-        promise.resolve(appUsageMap)
+        // Sort the apps by total time in foreground and get the top 3
+        val topApps = appUsageMap.entries.sortedByDescending { it.value }.take(3)
+
+        // Prepare the result map
+        val result = WritableNativeMap()
+        val totalTime = appUsageMap.values.sum()
+
+        // Add top apps to the result as app name -> time in seconds
+        val topAppsMap = WritableNativeMap()
+        for (entry in topApps) {
+            topAppsMap.putDouble(entry.key, (entry.value / 1000).toDouble()) // convert to seconds
+        }
+
+        result.putMap("topApps", topAppsMap)
+        result.putDouble("totalTime", (totalTime / 1000).toDouble()) // convert to seconds
+
+        promise.resolve(result)
     }
+
 }
