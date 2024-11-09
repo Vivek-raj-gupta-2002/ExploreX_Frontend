@@ -4,87 +4,66 @@ import { API_HOST, CHAT_HOST } from '@env';
 import { getData, storeData } from './storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Define the server URL for your WebSocket connection
+// Define the server URL for WebSocket
 const SERVER_URL = API_HOST;
 
 export const useChat = (chatId, token, email) => {
     const [messages, setMessages] = useState([]);
     const [socket, setSocket] = useState(null);
 
-    // Function to save messages to AsyncStorage
+    // AsyncStorage helper for saving messages
     const saveMessagesToStorage = async (chatId, newMessages) => {
         try {
-            await AsyncStorage.setItem(`${chatId}`, JSON.stringify(newMessages));
+            await AsyncStorage.setItem(`chat_${chatId}_messages`, JSON.stringify(newMessages));
         } catch (error) {
-            console.error('Error saving messages to AsyncStorage:', error);
+            console.error('Error saving messages:', error);
         }
     };
 
-    // Retrieve messages from AsyncStorage when the component mounts
+    // Load messages from AsyncStorage when the component mounts
     const loadMessagesFromStorage = async (chatId) => {
         try {
-            const storedMessages = await AsyncStorage.getItem(`${chatId}`);
-            if (storedMessages !== null) {
-                setMessages(JSON.parse(storedMessages));
-            }
+            const storedMessages = await AsyncStorage.getItem(`chat_${chatId}_messages`);
+            if (storedMessages) setMessages(JSON.parse(storedMessages));
         } catch (error) {
-            console.error('Error loading messages from AsyncStorage:', error);
+            console.error('Error loading messages:', error);
         }
     };
 
     useEffect(() => {
-        // Load saved messages on component mount
+        // Load messages from storage
         loadMessagesFromStorage(chatId);
 
         const newSocket = new WebSocket(`${CHAT_HOST}${chatId}/?token=${token}`);
+        newSocket.onopen = () => console.log('WebSocket connected');
+        newSocket.onclose = () => console.log('WebSocket disconnected');
+        newSocket.onerror = (error) => console.error('WebSocket error:', error);
 
-        // Set up the WebSocket connection
-        newSocket.onopen = () => {
-            console.log('WebSocket connection established');
-        };
-
-        // Listen for incoming messages
-        newSocket.onmessage = async (event) => {
+        newSocket.onmessage = (event) => {
             const messageData = JSON.parse(event.data);
             messageData.sender = email === messageData.sender ? 1 : 0;
-            const d = new Date();
-            let time = d.toLocaleTimeString();
-            messageData.time = time;
+
             
-            // Update messages state and store new message in AsyncStorage
+            messageData.time = new Date().toLocaleTimeString();
+            
+
+            console.log(messageData)
             setMessages((prevMessages) => {
                 const updatedMessages = [...prevMessages, messageData];
-                saveMessagesToStorage(chatId, updatedMessages);  // Save to AsyncStorage
+                saveMessagesToStorage(chatId, updatedMessages);
                 return updatedMessages;
             });
         };
 
-        // Handle socket closure
-        newSocket.onclose = () => {
-            console.log('WebSocket connection closed');
-        };
-
-        // Handle errors
-        newSocket.onerror = (error) => {
-            console.error('WebSocket error:', error);
-        };
-
         setSocket(newSocket);
 
-        // Clean up on component unmount
-        return () => {
-            newSocket.close();
-        };
-    }, [chatId, token]); // Re-establish connection when chatId or token changes
+        return () => newSocket.close();
+    }, [chatId, token]);
 
-    // Function to send a message to the server
+    // Send message to WebSocket server
     const sendMessage = (content) => {
         if (socket && content) {
-            const messageData = {
-                roomId: chatId,
-                message: content,
-            };
-            // Send the message data as a JSON string
+            const messageData = { roomId: chatId, message: content };
             socket.send(JSON.stringify(messageData));
         }
     };
@@ -92,36 +71,31 @@ export const useChat = (chatId, token, email) => {
     return { messages, sendMessage };
 };
 
-// Function to fetch chat data
+// Fetch chat data
 export const fetchChats = async () => {
     try {
         const token = await getData('access');
-
-        // Fetch chat data from the API
         const response = await fetch(`${API_HOST}/chats`, {
             method: 'GET',
             headers: {
-                'Authorization': `Bearer ${token}`, // Include token in Authorization header
+                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
             },
         });
 
-        // Check if the response is successful
         if (response.ok) {
-            const data = await response.json();
-            return data; // Return fetched chat data
+            return await response.json();
         } else {
             console.error('Failed to fetch chats', response.status);
-            return []; // Return null on failure
+            return [];
         }
     } catch (error) {
         console.error('Error fetching chats:', error);
-        return []; // Return null on error
+        return [];
     }
 };
 
-
-// Function to delete chat
+// Delete chat function
 export const deleteChat = async (chatId, token, navigation) => {
     try {
         const response = await fetch(`${API_HOST}/chats/${chatId}/`, {
@@ -133,21 +107,19 @@ export const deleteChat = async (chatId, token, navigation) => {
         });
 
         if (response.ok) {
-            console.log('Chat successfully deleted');
             Alert.alert("Success", "Chat deleted successfully");
-            // Navigate back to group list after deletion
             navigation.goBack();
         } else {
-            console.error('Failed to delete chat', response.status);
             Alert.alert("Error", "Failed to delete the chat.");
+            console.error('Delete chat failed:', response.status);
         }
     } catch (error) {
-        console.error('Error deleting chat:', error);
         Alert.alert("Error", "Something went wrong while deleting the chat.");
+        console.error('Error deleting chat:', error);
     }
 };
 
-// Function to show alert for confirmation
+// Confirm chat deletion with alert
 export const confirmDeleteChat = (chatId, token, navigation) => {
     Alert.alert(
         "Delete Chat",
@@ -155,7 +127,7 @@ export const confirmDeleteChat = (chatId, token, navigation) => {
         [
             {
                 text: "Cancel",
-                onPress: () => console.log("Delete chat canceled"),
+                onPress: () => console.log("Delete canceled"),
                 style: "cancel",
             },
             {

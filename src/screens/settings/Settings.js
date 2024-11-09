@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import CustomButton from '../../components/button';
 import CustomCard from '../../components/card';
 import TextStyles from '../../styles/textStyles'; // Your predefined text styles
@@ -18,21 +18,18 @@ const SettingsScreen = ({ navigation }) => {
                     const tempUser = JSON.parse(storedUser);
                     setUserInfo(tempUser);
 
-                    // Set userProfile to null before fetching or loading from storage
                     setUserProfile(null);
 
                     const tempUserProfile = await getData('userProfile');
 
                     if (!tempUserProfile) {
-                        // Fetch user profile if not stored in AsyncStorage
                         const tempData = await getUserProfile(tempUser.username);
-                        // console.log(tempData);
                         if (tempData) {
                             storeData('userProfile', JSON.stringify(tempData));
-                            setUserProfile(tempData); // Set the fetched profile data
+                            setUserProfile(tempData);
                         }
                     } else {
-                        setUserProfile(JSON.parse(tempUserProfile)); // Use the stored profile
+                        setUserProfile(JSON.parse(tempUserProfile));
                     }
                 }
             } catch (error) {
@@ -57,7 +54,6 @@ const SettingsScreen = ({ navigation }) => {
         );
     }
 
-    // Extract good and bad habits from userProfile with fallback values
     const goodThings = [
         userProfile?.good_habit_1 || "No good habits listed",
         userProfile?.good_habit_2 || "No good habits listed",
@@ -76,43 +72,37 @@ const SettingsScreen = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            {/* Profile Info */}
-            <View style={styles.profileContainer}>
-                <Image
-                    source={{ uri: userInfo.profile_pic || 'https://randomuser.me/api/portraits/men/4.jpg' }}
-                    style={styles.profileImage}
-                />
-                <Text style={TextStyles.heading2}>
-                    {`${userInfo.first_name || ''} ${userInfo.last_name || ''}`}
-                </Text>
-                <Text style={TextStyles.paragraph}>
-                    {userInfo.username || userProfile?.email || 'No username available'}
-                </Text>
-                <Text style={TextStyles.subheading}>
-                    {userProfile?.bio || 'No bio available'}
-                </Text>
-            </View>
+            <ScrollView contentContainerStyle={styles.scrollContainer}>
+                {/* Profile Info */}
+                <View style={styles.profileContainer}>
+                    <Image
+                        source={{ uri: userInfo.profile_pic || 'https://randomuser.me/api/portraits/men/4.jpg' }}
+                        style={styles.profileImage}
+                    />
+                    <Text style={TextStyles.heading2}>
+                        {`${userInfo.first_name || ''} ${userInfo.last_name || ''}`}
+                    </Text>
+                    <Text style={TextStyles.paragraph}>
+                        {userInfo.username || userProfile?.email || 'No username available'}
+                    </Text>
+                    <Text style={TextStyles.subheading}>
+                        {userProfile?.bio || 'No bio available'}
+                    </Text>
+                </View>
 
-            {/* Custom Card for 5 Good and Bad Things */}
-            <CustomCard containerStyle={styles.customCard}>
-                <Text style={TextStyles.heading3}>5 Good Things</Text>
-                {goodThings.length > 0 ? (
-                    goodThings.map((item, index) => (
+                {/* Custom Card for 5 Good and Bad Things */}
+                <CustomCard containerStyle={styles.customCard}>
+                    <Text style={TextStyles.heading3}>5 Good Things</Text>
+                    {goodThings.map((item, index) => (
                         <Text key={index} style={TextStyles.paragraph}>• {item}</Text>
-                    ))
-                ) : (
-                    <Text style={TextStyles.paragraph}>No good habits available</Text>
-                )}
+                    ))}
 
-                <Text style={TextStyles.heading3}>5 Bad Things</Text>
-                {badThings.length > 0 ? (
-                    badThings.map((item, index) => (
+                    <Text style={TextStyles.heading3}>5 Bad Things</Text>
+                    {badThings.map((item, index) => (
                         <Text key={index} style={TextStyles.paragraph}>• {item}</Text>
-                    ))
-                ) : (
-                    <Text style={TextStyles.paragraph}>No bad habits available</Text>
-                )}
-            </CustomCard>
+                    ))}
+                </CustomCard>
+            </ScrollView>
 
             {/* Update Button */}
             <TouchableOpacity style={styles.updateButton}>
@@ -137,12 +127,15 @@ const SettingsScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 20,
         backgroundColor: '#f9f9f9',
+    },
+    scrollContainer: {
+        padding: 20,
+        paddingBottom: 80, // Extra padding to prevent overlap with the update button
     },
     profileContainer: {
         alignItems: 'center',
-        marginBottom: 5,
+        marginBottom: 10,
     },
     profileImage: {
         width: 100,
