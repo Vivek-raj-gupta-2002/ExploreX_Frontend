@@ -25,6 +25,7 @@ const AnalyticsScreen = ({ navigation }) => {
     const fetchUserSummary = async () => {
         const summary = await getData('userSum'); // Adjust the key as necessary
         setUserSummary(JSON.parse(summary));
+        
     };
 
     // Function to fetch screen time data
@@ -47,6 +48,8 @@ const AnalyticsScreen = ({ navigation }) => {
         const unsubscribe = navigation.addListener('focus', () => {
             fetchUserSummary();
             fetchScreenTimeData();
+
+            console.log(userSummary)
         });
 
         // Cleanup listener on unmount
@@ -76,7 +79,7 @@ const AnalyticsScreen = ({ navigation }) => {
             {/* Card for User Mood Analysis */}
             <CustomCard containerStyle={styles.cardContainer}>
                 <Text style={TextStyles.heading2}>User Mood Analysis</Text>
-                <Text style={TextStyles.paragraph}>{userSummary?.mood}</Text>
+                <Text style={TextStyles.paragraph}>{userSummary?.mood || ""}</Text>
             </CustomCard>
 
             {/* Card for User Summary */}

@@ -27,9 +27,7 @@ const HomeScreen = ({ navigation }) => {
 
     useEffect(() => {
         const fetchData = async () => {
-            console.log("started");
-            console.log(await getScreenTimeData());
-            console.log("end");
+            
 
             const userSum = await GetSummary();
             if (userSum) {
@@ -67,7 +65,7 @@ const HomeScreen = ({ navigation }) => {
         alert('Your entry has been submitted!');
     };
 
-    const renderTaskItems = () => (
+    const renderTaskItems = () =>
         task.map((item, index) => (
             <CustomCard key={index} cardStyle={styles.activityContainer}>
                 <Text style={TextStyles.subheading}>{item}</Text>
@@ -80,10 +78,9 @@ const HomeScreen = ({ navigation }) => {
                     onPress={() => navigation.navigate('New Post')}
                 />
             </CustomCard>
-        ))
-    );
+        ));
 
-    const renderMusicItems = () => (
+    const renderMusicItems = () =>
         musicSuggestions.map(item => (
             <CustomCard key={item.id} cardStyle={styles.songCard}>
                 <Image style={styles.musicImage} source={item.image} />
@@ -91,50 +88,68 @@ const HomeScreen = ({ navigation }) => {
                     <Text style={TextStyles.heading3}>{item.title}</Text>
                     <Text style={TextStyles.paragraph}>{item.description}</Text>
                     <View style={styles.actionButtons}>
-                        <LikeDislikeButton onLike={() => console.log(`Liked ${item.title}`)} onDislike={() => console.log(`Disliked ${item.title}`)} />
-                        <CustomIconButton iconName="play-circle" iconColor="white" backgroundColor="tomato" iconSize={30} style={styles.playButton} />
+                        <LikeDislikeButton
+                            onLike={() => console.log(`Liked ${item.title}`)}
+                            onDislike={() => console.log(`Disliked ${item.title}`)}
+                        />
+                        <CustomIconButton
+                            iconName="play-circle"
+                            iconColor="white"
+                            backgroundColor="tomato"
+                            iconSize={30}
+                            style={styles.playButton}
+                        />
                     </View>
                 </View>
             </CustomCard>
-        ))
-    );
+        ));
 
     return (
-        <ScrollView contentContainerStyle={styles.container}>
-            <CustomCard cardStyle={styles.card}>
-                <TextInput
-                    style={[styles.textInput, { margin: 10, width: "90%" }]}
-                    placeholder="Anything Good!!!!!"
-                    value={good}
-                    onChangeText={(text) => setGood(text)}
-                />
-                <TextInput
-                    style={[styles.textInput, { margin: 10, width: "90%" }]}
-                    placeholder="Anything Not Good!!!!"
-                    value={bad}
-                    onChangeText={(text) => setBad(text)}
-                />
-                <CustomButton title="Submit" onPress={handleSubmit} />
-            </CustomCard>
+        <View style={{ flex: 1, position: 'relative' }}>
+            <ScrollView contentContainerStyle={styles.container}>
+                <CustomCard cardStyle={styles.card}>
+                    <TextInput
+                        style={[styles.textInput, { margin: 10, width: '90%' }]}
+                        placeholder="Anything Good!!!!!"
+                        value={good}
+                        onChangeText={text => setGood(text)}
+                    />
+                    <TextInput
+                        style={[styles.textInput, { margin: 10, width: '90%' }]}
+                        placeholder="Anything Not Good!!!!"
+                        value={bad}
+                        onChangeText={text => setBad(text)}
+                    />
+                    <CustomButton title="Submit" onPress={handleSubmit} />
+                </CustomCard>
 
-            <CustomCard cardStyle={styles.card}>
-                <Text style={TextStyles.heading3}>Recommended Activities</Text>
-                {renderTaskItems()}
-                <CustomButton textColor="grey" backgroundColor="white" title="Leader Board" onPress={() => navigation.navigate('Leader Board')} />
-            </CustomCard>
+                <CustomCard cardStyle={styles.card}>
+                    <Text style={TextStyles.heading3}>Recommended Activities</Text>
+                    {renderTaskItems()}
+                    <CustomButton
+                        textColor="grey"
+                        backgroundColor="white"
+                        title="Leader Board"
+                        onPress={() => navigation.navigate('Leader Board')}
+                    />
+                </CustomCard>
 
-            <CustomCard cardStyle={styles.card}>
-                <Text style={TextStyles.heading3}>Your Personality Says</Text>
-                <Text style={TextStyles.paragraph}>{`${summ?.personality || "Nothing to say"}`}</Text>
-                <LikeDislikeButton onLike={() => console.log("Liked")} onDislike={() => console.log("Disliked")} />
-            </CustomCard>
+                <CustomCard cardStyle={styles.card}>
+                    <Text style={TextStyles.heading3}>Your Personality Says</Text>
+                    <Text style={TextStyles.paragraph}>{`${summ?.personality || 'Nothing to say'}`}</Text>
+                    <LikeDislikeButton
+                        onLike={() => console.log('Liked')}
+                        onDislike={() => console.log('Disliked')}
+                    />
+                </CustomCard>
 
-            <CustomCard cardStyle={styles.card}>
-                <Text style={TextStyles.heading3}>Music Suggestions</Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.musicSlider}>
-                    {renderMusicItems()}
-                </ScrollView>
-            </CustomCard>
+                <CustomCard cardStyle={styles.card}>
+                    <Text style={TextStyles.heading3}>Music Suggestions</Text>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.musicSlider}>
+                        {renderMusicItems()}
+                    </ScrollView>
+                </CustomCard>
+            </ScrollView>
 
             <TouchableOpacity style={styles.floatingButton}>
                 <CustomIconButton
@@ -146,28 +161,54 @@ const HomeScreen = ({ navigation }) => {
                     onPress={() => navigation.navigate('Notes')}
                 />
             </TouchableOpacity>
-        </ScrollView>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: { flexGrow: 1, paddingBottom: 20 },
     card: { alignItems: 'center', marginBottom: 20 },
-    activityContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10, width: '100%' },
+    activityContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: 10,
+        width: '100%',
+    },
     iconButton: { margin: 3 },
     musicImage: { width: 100, height: 100, borderRadius: 10 },
-    songCard: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10, marginRight: 10 },
+    songCard: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: 10,
+        marginRight: 10,
+    },
     songDetails: { flex: 1, marginLeft: 10 },
     actionButtons: { flexDirection: 'row', alignItems: 'center', marginTop: 5 },
     playButton: { marginLeft: 10 },
     musicSlider: { paddingVertical: 10 },
     floatingButton: {
-        position: 'absolute', bottom: 20, right: 20, width: 60, height: 60,
-        borderRadius: 30, backgroundColor: 'tomato', justifyContent: 'center',
-        alignItems: 'center', elevation: 5, zIndex: 100
+        position: 'absolute',
+        bottom: 20,
+        right: 20,
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        backgroundColor: 'tomato',
+        justifyContent: 'center',
+        alignItems: 'center',
+        elevation: 5,
+        zIndex: 100,
     },
     plusIcon: { margin: 0 },
-    textInput: { borderWidth: 1, borderColor: 'gray', padding: 8, borderRadius: 5, fontSize: 16 },
+    textInput: {
+        borderWidth: 1,
+        borderColor: 'gray',
+        padding: 8,
+        borderRadius: 5,
+        fontSize: 16,
+    },
 });
 
 export default HomeScreen;

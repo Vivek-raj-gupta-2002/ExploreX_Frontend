@@ -17,7 +17,7 @@ export const GetSummary = async () => {
             // console.log('notes posts retrieved successfully:', jsonResponse);
             return jsonResponse;  // Return the retrieved data
         } else {
-            console.error('Failed to retrieve posts entry:', response.status);
+            console.error('Failed to retrieve summary entry:', response.status);
             return null;  // Return null in case of failure
         }
     } catch (error) {
