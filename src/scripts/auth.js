@@ -1,6 +1,7 @@
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { clearStorage, removeData, storeData } from './storage'; // Assuming storage script for async storage handling
-import { API_HOST } from '@env';
+import { API_HOST } from '../scripts/var';
+
 
 export const handleLogout = async (navigation) => {
     try {

@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "MyApp",
+    "name": "ExploreX",
     "slug": "MyApp",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/logo.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
@@ -23,6 +23,11 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "b475da5d-e8a4-402c-ac7d-78435041de47"
+      }
     }
   }
 }

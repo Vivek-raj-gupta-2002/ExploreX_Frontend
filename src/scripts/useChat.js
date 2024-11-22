@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Alert } from 'react-native';
-import { API_HOST, CHAT_HOST } from '@env';
+import { API_HOST, CHAT_HOST } from '../scripts/var';
 import { getData, storeData } from './storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 

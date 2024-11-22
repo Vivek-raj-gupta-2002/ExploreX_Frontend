@@ -1,4 +1,4 @@
-import { API_HOST } from '@env';
+import { API_HOST } from '../scripts/var';
 import { getData } from './storage';
 
 const API_URL_GET = `${API_HOST}/api/profiles`;

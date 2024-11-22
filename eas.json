@@ -1,0 +1,30 @@
+{
+  "cli": {
+    "version": ">= 12.5.1",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "preview": {
+      "distribution": "internal"
+    },
+    "production": {
+      "autoIncrement": true,
+      "android": {
+        "distribution": "internal",
+        "env": {
+          "API_HOST": "<Your APIHOST>",
+          "CHAT_HOST": "<YOUR CHAT HOST>",
+          "GOOGLE_WEB_CLIENT_ID": "<YOUR client id>"
+        }
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

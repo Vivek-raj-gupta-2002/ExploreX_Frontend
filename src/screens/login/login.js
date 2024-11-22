@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Dimensions, ActivityIndicator } from 'react-native';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { LinearGradient } from 'expo-linear-gradient';
-import { GOOGLE_WEB_CLIENT_ID } from '@env';
+import { GOOGLE_WEB_CLIENT_ID } from '../../scripts/var';
 import { signInWithGoogle } from '../../scripts/auth'; // Import the sign-in function
 
 const { width, height } = Dimensions.get('window');
