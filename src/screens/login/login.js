@@ -1,15 +1,30 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Dimensions, ActivityIndicator } from 'react-native';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { LinearGradient } from 'expo-linear-gradient';
 import { GOOGLE_WEB_CLIENT_ID } from '../../scripts/var';
 import { signInWithGoogle } from '../../scripts/auth'; // Import the sign-in function
+import { getData } from '../../scripts/storage';
+import { useFocusEffect } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get('window');
 const LoginLogo = require('../../assets/googleLoginLogo.png');
 
 const GoogleLoginScreen = ({ navigation }) => {
     const [loading, setLoading] = useState(false); // Loading state
+
+    useFocusEffect(
+        useCallback(() => {
+            const checkLoginStatus = async () => {
+                const access = await getData('access');
+                if (access) {
+                    navigation.navigate('HomeNav'); // Navigate to home if access token exists
+                }
+            };
+
+            checkLoginStatus();
+        }, [navigation])
+    );
 
     useEffect(() => {
         // Configure Google Sign-In
