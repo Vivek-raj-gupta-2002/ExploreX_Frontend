@@ -15,7 +15,7 @@ const GroupScreen = ({ navigation }) => {
                 const [data, tokenValue, userInfoJson] = await Promise.all([
                     fetchChats(),
                     getData('access'),
-                    getData('userDetails')
+                    getData('userDetails'),
                 ]);
 
                 const userInfo = JSON.parse(userInfoJson);
@@ -23,7 +23,7 @@ const GroupScreen = ({ navigation }) => {
                 setToken(tokenValue);
                 setUser(userInfo);
             } catch (error) {
-                console.error("Failed to load chats or user info:", error);
+                console.error('Failed to load chats or user info:', error);
             }
         };
 
@@ -35,8 +35,15 @@ const GroupScreen = ({ navigation }) => {
 
     useEffect(() => {
         if (user && user.id) {
-            const aiChat = { id: `AI_${user.id}`, title: "AI Chat" };
-            setGroups((prevGroups) => [aiChat, ...prevGroups]);
+            setGroups((prevGroups) => {
+                // Check if AI Chat is already in the list
+                const aiChatExists = prevGroups.some((group) => group.id === `AI_${user.id}`);
+                if (!aiChatExists) {
+                    const aiChat = { id: `AI_${user.id}`, title: 'AI Chat', undelivered_message_count: 0 };
+                    return [aiChat, ...prevGroups];
+                }
+                return prevGroups;
+            });
         }
     }, [user]);
 
@@ -49,7 +56,6 @@ const GroupScreen = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollView}>
-                {/* Dynamically loaded group chats */}
                 {groups.map((group) => (
                     <TouchableOpacity
                         key={group.id}
@@ -59,6 +65,13 @@ const GroupScreen = ({ navigation }) => {
                         <View style={styles.groupInfo}>
                             <Text style={TextStyles.paragraph}>{group.title}</Text>
                         </View>
+                        {group.undelivered_message_count > 0 && (
+                            <View style={styles.messageCountContainer}>
+                                <Text style={styles.messageCountText}>
+                                    {group.undelivered_message_count > 5 ? '5+' : group.undelivered_message_count}
+                                </Text>
+                            </View>
+                        )}
                     </TouchableOpacity>
                 ))}
             </ScrollView>
@@ -86,6 +99,19 @@ const styles = StyleSheet.create({
     },
     groupInfo: {
         flex: 1,
+    },
+    messageCountContainer: {
+        backgroundColor: '#FF4D4D',
+        borderRadius: 15,
+        minWidth: 30,
+        height: 30,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    messageCountText: {
+        color: 'white',
+        fontSize: 14,
+        fontWeight: 'bold',
     },
 });
 
