@@ -7,7 +7,7 @@ import { getData } from '../../scripts/storage';
 const GroupScreen = ({ navigation }) => {
     const [groups, setGroups] = useState([]);
     const [token, setToken] = useState();
-    const [user, setUser] = useState();
+    const [user, setUser] = useState(null);
 
     useEffect(() => {
         const getChats = async () => {
@@ -22,8 +22,6 @@ const GroupScreen = ({ navigation }) => {
                 setGroups(data);
                 setToken(tokenValue);
                 setUser(userInfo);
-
-                
             } catch (error) {
                 console.error("Failed to load chats or user info:", error);
             }
@@ -35,26 +33,22 @@ const GroupScreen = ({ navigation }) => {
         return unsubscribe;
     }, [navigation]);
 
-    const navigateToChat = (groupName, chatId) => {
-        navigation.navigate('chat', { groupName, chatId, token, email: user.email });
-    };
+    useEffect(() => {
+        if (user && user.id) {
+            const aiChat = { id: `AI_${user.id}`, title: "AI Chat" };
+            setGroups((prevGroups) => [aiChat, ...prevGroups]);
+        }
+    }, [user]);
 
-    const getUserSpecificAiRoomId = (userId) => `AI_${userId}`;
+    const navigateToChat = (groupName, chatId) => {
+        if (user) {
+            navigation.navigate('chat', { groupName, chatId, token, email: user.email });
+        }
+    };
 
     return (
         <View style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollView}>
-                {/* AI Chat Room with a unique user-specific ID */}
-                <TouchableOpacity
-                    key={`AI`}
-                    style={styles.groupItem}
-                    onPress={() => navigateToChat("AI Chat", getUserSpecificAiRoomId(user.id))}
-                >
-                    <View style={styles.groupInfo}>
-                        <Text style={TextStyles.paragraph}>AI Chat</Text>
-                    </View>
-                </TouchableOpacity>
-
                 {/* Dynamically loaded group chats */}
                 {groups.map((group) => (
                     <TouchableOpacity
