@@ -17,9 +17,9 @@
       "android": {
         "distribution": "internal",
         "env": {
-          "API_HOST": "<Your APIHOST>",
-          "CHAT_HOST": "<YOUR CHAT HOST>",
-          "GOOGLE_WEB_CLIENT_ID": "<YOUR client id>"
+          "API_HOST": "https://explorexipsa-fqbpdkapesb0eka6.canadacentral-01.azurewebsites.net",
+          "CHAT_HOST": "wss://explorexipsa-fqbpdkapesb0eka6.canadacentral-01.azurewebsites.net/ws/",
+          "GOOGLE_WEB_CLIENT_ID": "205944777590-ms7pt77feu1vballokfqbm3rt6g63jij.apps.googleusercontent.com"
         }
       }
     }

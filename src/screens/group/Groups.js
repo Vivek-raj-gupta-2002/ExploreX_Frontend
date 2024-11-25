@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import TextStyles from '../../styles/textStyles';
 import { fetchChats } from '../../scripts/useChat';
 import { getData } from '../../scripts/storage';
@@ -8,9 +8,11 @@ const GroupScreen = ({ navigation }) => {
     const [groups, setGroups] = useState([]);
     const [token, setToken] = useState();
     const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const getChats = async () => {
+            setLoading(true); // Start loading
             try {
                 const [data, tokenValue, userInfoJson] = await Promise.all([
                     fetchChats(),
@@ -24,6 +26,8 @@ const GroupScreen = ({ navigation }) => {
                 setUser(userInfo);
             } catch (error) {
                 console.error('Failed to load chats or user info:', error);
+            } finally {
+                setLoading(false); // Stop loading
             }
         };
 
@@ -55,26 +59,30 @@ const GroupScreen = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            <ScrollView contentContainerStyle={styles.scrollView}>
-                {groups.map((group) => (
-                    <TouchableOpacity
-                        key={group.id}
-                        style={styles.groupItem}
-                        onPress={() => navigateToChat(group.title, group.id)}
-                    >
-                        <View style={styles.groupInfo}>
-                            <Text style={TextStyles.paragraph}>{group.title}</Text>
-                        </View>
-                        {group.undelivered_message_count > 0 && (
-                            <View style={styles.messageCountContainer}>
-                                <Text style={styles.messageCountText}>
-                                    {group.undelivered_message_count > 5 ? '5+' : group.undelivered_message_count}
-                                </Text>
+            {loading ? (
+                <ActivityIndicator size="large" color="#FF4D4D" style={styles.loader} />
+            ) : (
+                <ScrollView contentContainerStyle={styles.scrollView}>
+                    {groups.map((group) => (
+                        <TouchableOpacity
+                            key={group.id}
+                            style={styles.groupItem}
+                            onPress={() => navigateToChat(group.title, group.id)}
+                        >
+                            <View style={styles.groupInfo}>
+                                <Text style={TextStyles.paragraph}>{group.title}</Text>
                             </View>
-                        )}
-                    </TouchableOpacity>
-                ))}
-            </ScrollView>
+                            {group.undelivered_message_count > 0 && (
+                                <View style={styles.messageCountContainer}>
+                                    <Text style={styles.messageCountText}>
+                                        {group.undelivered_message_count > 5 ? '5+' : group.undelivered_message_count}
+                                    </Text>
+                                </View>
+                            )}
+                        </TouchableOpacity>
+                    ))}
+                </ScrollView>
+            )}
         </View>
     );
 };
@@ -84,6 +92,11 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 20,
         backgroundColor: '#f9f9f9',
+    },
+    loader: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     scrollView: {
         paddingBottom: 20,

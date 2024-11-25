@@ -1,30 +1,27 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, KeyboardAvoidingView } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, KeyboardAvoidingView } from 'react-native';
 import CustomIconButton from '../../../components/iconButton';
 import CustomTextInput from '../../../components/input';
 import TextStyles from '../../../styles/textStyles';
-import {useChat} from '../../../scripts/useChat';  // Import useChat hook
+import { useChat } from '../../../scripts/useChat';
 import { getData } from '../../../scripts/storage';
 
 const ChatScreen = ({ navigation, route }) => {
-    const { groupName, chatId, token, email } = route.params;  // Assuming chatId and token are passed via route params
-    
+    const { groupName, chatId, token, email } = route.params;
+
     const [message, setMessage] = useState('');
     const flatListRef = useRef(null);
 
-    // Use the useChat hook to handle WebSocket connection and real-time messaging
-    const { messages, sendMessage } = useChat(chatId, token, email);
+    const { messages, sendMessage, loading } = useChat(chatId, token, email);
 
-
-    // Scroll to the bottom of the FlatList when messages update
     useEffect(() => {
         flatListRef.current?.scrollToEnd({ animated: true });
     }, [messages]);
 
     const handleSend = () => {
         if (message.trim()) {
-            sendMessage(message.trim());  // Send message through WebSocket
-            setMessage('');  // Clear input field
+            sendMessage(message.trim());
+            setMessage('');
         }
     };
 
@@ -37,9 +34,17 @@ const ChatScreen = ({ navigation, route }) => {
         </View>
     );
 
+    if (loading) {
+        return (
+            <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="tomato" />
+                <Text style={TextStyles.subtitle}>Connecting...</Text>
+            </View>
+        );
+    }
+
     return (
         <KeyboardAvoidingView style={styles.container} behavior="padding">
-            {/* Chat Content */}
             <View style={styles.chatContent}>
                 <FlatList
                     ref={flatListRef}
@@ -49,7 +54,6 @@ const ChatScreen = ({ navigation, route }) => {
                 />
             </View>
 
-            {/* Input Box and Send Button */}
             <View style={styles.inputContainer}>
                 <CustomTextInput
                     value={message}
@@ -76,6 +80,11 @@ const styles = StyleSheet.create({
     chatContent: {
         flex: 1,
         padding: 10,
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     sentMessageBubble: {
         backgroundColor: 'tomato',
