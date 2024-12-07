@@ -13,6 +13,7 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.WritableNativeMap
+import java.util.Calendar // Add this import
 
 class ScreenTimeModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
 
@@ -39,17 +40,25 @@ class ScreenTimeModule(reactContext: ReactApplicationContext) : ReactContextBase
             }
 
             val usageStatsManager = reactApplicationContext.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
-            val endTime = System.currentTimeMillis()
-            val startTime = endTime - (24 * 60 * 60 * 1000)
+
+            // Corrected time range calculation
+            val now = System.currentTimeMillis()
+            val startOfDay = Calendar.getInstance().apply {
+                timeInMillis = now
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }.timeInMillis
 
             val stats: List<UsageStats> = usageStatsManager.queryUsageStats(
                 UsageStatsManager.INTERVAL_BEST,
-                startTime,
-                endTime
+                startOfDay,
+                now
             )
 
             if (stats.isEmpty()) {
-                promise.reject("NO_DATA", "No usage data available for the past 24 hours")
+                promise.reject("NO_DATA", "No usage data available for today")
                 return
             }
 
@@ -59,7 +68,7 @@ class ScreenTimeModule(reactContext: ReactApplicationContext) : ReactContextBase
                 val timeVisible = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     usageStat.totalTimeVisible
                 } else {
-                    0L // Fallback for unsupported API levels
+                    usageStat.totalTimeInForeground
                 }
                 if (timeVisible > 0) {
                     appUsageMap[packageName] = appUsageMap.getOrDefault(packageName, 0) + timeVisible
